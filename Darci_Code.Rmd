@@ -1,0 +1,64 @@
+---
+title: "Final Scratch Work"
+output: html_document
+date: "2023-04-16"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+library(emoji)
+library(dplyr)
+library(ggimage)
+library(emojifont)
+```
+
+
+### Loading data
+```{r}
+price <- read.csv("data/CPI_Data/ap.data.3.Food.csv")
+price_code <- read.csv("data/CPI_Data/ap.item.csv")
+usda <- read.csv("data/USDA_Data/annual_crop_yield_and_price_2002-2023.csv")
+
+# merge in CPI descriptions with CPI data
+price$item_code <- price$series_id
+price$item_code <- gsub("APU0000",'',price$item_code)
+price$item_code <- gsub("APU0100",'',price$item_code)
+price$item_code <- gsub("APU0200",'',price$item_code)
+price$item_code <- gsub("APU0300",'',price$item_code)
+price$item_code <- gsub("APU0400",'',price$item_code)
+
+price <- merge(price, price_code, by="item_code")
+
+
+
+```
+
+
+### production yearly plot
+
+```{r}
+#
+usda$Value_numeric <- as.numeric(gsub(",","",usda$Value))
+
+
+make_production_plot <- function(food,variable,fruit_veg,color,color2){
+  filter(usda, Data.Item == variable) %>% 
+  ggplot() + 
+    geom_line(aes(x=Year, y = Value_numeric), color=color2,size=.5) +
+    geom_point(aes(x=Year, y = Value_numeric), color=color2, size=.5) +
+    geom_text(label = emoji(fruit_veg),  size=6.5,family="EmojiOne",color=color,aes(x=Year, y = Value_numeric)) +
+   # gg_image(aes(image= fruit_veg))
+    labs(x="Year",y="Production (tons)",title=food) 
+
+}
+
+make_production_plot("Apple","APPLES - PRODUCTION, MEASURED IN TONS","apple","red","pink")
+make_production_plot("Pear","PEARS - PRODUCTION, MEASURED IN TONS","pear", "#255328","#82F789")
+make_production_plot("Grape","GRAPES - PRODUCTION, MEASURED IN TONS","grapes", "#255328","#82F789")
+```
+
+
+
+
+
