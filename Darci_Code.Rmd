@@ -132,7 +132,7 @@ broccoli_2017_map$Value_numeric <- as.numeric(gsub(",","",broccoli_2017_map$Valu
   scale_fill_continuous(name = "Broccoli Produced (CWT)", label = scales::comma, low = "green", high = "#023020",na.value="#EEEEEE") + 
   theme_map() + 
   theme(legend.position = "right") + 
-  labs(title = "Tons of Broccoli Produced in 2017 by State") 
+  labs(title = "CWT of Broccoli Produced in 2017 by State") 
   
   
   
@@ -146,7 +146,23 @@ apple_2017_map$Value_numeric <- as.numeric(gsub(",","",apple_2017_map$Value))
   scale_fill_continuous(name = "Apple Produced (LB)", label = scales::comma, low = "green", high = "red",na.value="#EEEEEE") + 
   theme_map() + 
   theme(legend.position = "right") + 
-  labs(title = "Tons of Apple Produced in 2017 by State") 
+  labs(title = "Pounds of Apple Produced in 2017 by State") 
+  
+  
+  orange_2017 <- filter(usda_state, Data.Item == "ORANGES, MID & NAVEL, UTILIZED - PRODUCTION, MEASURED IN TONS",Year == "2017")
+orange_2017_map <- merge(usstate_sf,orange_2017,by="State",all=TRUE)
+orange_2017_map$Value_numeric <- as.numeric(gsub(",","",orange_2017_map$Value))
+
+  ggplot() + 
+  #geom_sf(data = usstate_sf , fill = NA, color = "#EEEEEE", size = 1) + 
+  geom_sf(data = orange_2017_map, color="#EEEEEE", aes(fill = Value_numeric)) +
+  scale_fill_continuous(name = "Mid & Navel Oranges Produced (tons)", label = scales::comma, low = "yellow", high = "red",na.value="#EEEEEE") + 
+  theme_map() + 
+  theme(legend.position = "right") + 
+  labs(title = "Tons of Mid & Navel Oranges Produced in 2017 by State") 
+  
+  
+  
   
 
 ```
