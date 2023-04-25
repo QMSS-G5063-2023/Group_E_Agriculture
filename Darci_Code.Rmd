@@ -34,6 +34,7 @@ library(stringr)
 library(urbnmapr)
 
 
+
 ```
 
 
@@ -82,7 +83,7 @@ make_production_plot("Grape","GRAPES - PRODUCTION, MEASURED IN TONS","grapes", "
 ```
 
 
-### state level data a
+### Maps - GGPLOT
 
 ```{r, warnings=FALSE}
 
@@ -128,7 +129,7 @@ make_production_map <- function(fruit_veg, unit,year) {
 make_production_map("PEACHES","TONS","2017")
 make_production_map("BROCCOLI","CWT","2017")
 make_production_map("APPLES","LB","2017")
-make_production_map("ORANGES, MID & NAVEL - UTILIZED","TONS","2017") ### FIX THIS MAP
+make_production_map("ORANGES, MID & NAVEL, UTILIZED","TONS","2017")
 make_production_map("CABBAGE","CWT","2017")
 make_production_map("CAULIFLOWER","CWT","2017")
 make_production_map("LEMONS, UTILIZED","TONS","2017")
@@ -142,26 +143,95 @@ make_production_map("CUCUMBERS","CWT","2017")
 make_production_map("GARLIC","CWT","2017")
 make_production_map("GRAPEFRUIT, UTILIZED","TONS","2017")
 make_production_map("GRAPES","TONS","2017")
-
+make_production_map("LETTUCE, ROMAINE, UTILIZED","CWT","2017")
+make_production_map("MELONS, CANTALOUPE","CWT","2017")
+make_production_map("SPINACH","CWT","2017")
+make_production_map("ARTICHOKES, UTILIZED","CWT","2017")
+make_production_map("ONIONS, DRY, UTILIZED","CWT","2017")
+make_production_map("PEARS","TONS","2017")
+make_production_map("PEPPERS, BELL, UTILIZED","CWT","2017")
+make_production_map("PEPPERS, CHILE","CWT","2017")
+make_production_map("POTATOES","CWT","2017")
+make_production_map("PUMPKINS","CWT","2017")
+make_production_map("SQUASH","CWT","2017")
+make_production_map("SWEET CORN","CWT","2017")
+make_production_map("SWEET POTATOES","CWT","2017")
+make_production_map("TANGERINES, UTILIZED","TONS","2017")
+make_production_map("TOMATOES, IN THE OPEN, UTILIZED","CWT","2017")
 
 ```
 
 
 
 
+### Maps - Leaflet 
+
+```{r}
+
+
+
+make_production_map2 <- function(fruit_veg, unit,year) {
+  data_year <- filter(usda_state, Data.Item == paste0(fruit_veg, " - PRODUCTION, MEASURED IN ", unit),Year == year)
+  data_year_map <-  merge(usstate_sf,data_year,by="State",all=TRUE)
+  data_year_map <- st_transform(data_year_map, "+proj=longlat +datum=WGS84")
+  data_year_map$Value_numeric <- as.numeric(gsub(",","",data_year_map$Value))
+  pal <- colorNumeric(palette = c("green","#023020"),domain=data_year_map$Value_numeric)
+  content <- paste(data_year_map$State,"<br/>",
+                 "Production:",data_year_map$Value_numeric)
+  map <- leaflet(data_year_map) %>%
+   addPolygons(data = data_year_map, 
+              fillColor = ~pal(Value_numeric), 
+              fillOpacity = 1, 
+              color = "#EEEEEE",
+              weight = 0.5, 
+              popup = content,
+              popupOptions = labelOptions(style = list("font-weight" = "normal", padding = "3px 8px"), textsize = "15px", direction = "auto")) %>%
+      addLegend(position = "bottomright", 
+            pal = pal, 
+            values = data_year_map$Value_numeric,
+            title = paste0(fruit_veg, " PRODUCED IN ", unit), 
+            opacity = 1)
+   return(map)
+}
 
 
 
 
+make_production_map2("PEACHES","TONS","2017")
+make_production_map2("BROCCOLI","CWT","2017")
+make_production_map2("APPLES","LB","2017")
+make_production_map2("ORANGES, MID & NAVEL, UTILIZED","TONS","2017")
+make_production_map2("CABBAGE","CWT","2017")
+make_production_map2("CAULIFLOWER","CWT","2017")
+make_production_map2("LEMONS, UTILIZED","TONS","2017")
+make_production_map2("MELONS, WATERMELON","CWT","2017")
+#make_production_map2("SPINACH","CWT","2017")
+make_production_map2("CARROTS","CWT","2017")
+#make_production_map2("ASPARAGUS","CWT","2017")
+make_production_map2("BEANS, SNAP","CWT","2017")
+make_production_map2("CELERY","CWT","2017")
+#make_production_map2("CUCUMBERS","CWT","2017")
+make_production_map2("GARLIC","CWT","2017")
+make_production_map2("GRAPEFRUIT, UTILIZED","TONS","2017")
+make_production_map2("GRAPES","TONS","2017")
+make_production_map2("LETTUCE, ROMAINE, UTILIZED","CWT","2017")
+#make_production_map2("MELONS, CANTALOUPE","CWT","2017")
+make_production_map2("SPINACH","CWT","2017")
+make_production_map2("ARTICHOKES, UTILIZED","CWT","2017")
+make_production_map2("ONIONS, DRY, UTILIZED","CWT","2017")
+make_production_map2("PEARS","TONS","2017")
+make_production_map2("PEPPERS, BELL, UTILIZED","CWT","2017")
+make_production_map2("PEPPERS, CHILE","CWT","2017")
+make_production_map2("POTATOES","CWT","2017")
+make_production_map2("PUMPKINS","CWT","2017")
+make_production_map2("SQUASH","CWT","2017")
+make_production_map2("SWEET CORN","CWT","2017")
+make_production_map2("SWEET POTATOES","CWT","2017")
+make_production_map2("TANGERINES, UTILIZED","TONS","2017")
+make_production_map2("TOMATOES, IN THE OPEN, UTILIZED","CWT","2017")
 
 
 
-
-
-
-
-
-
-
+```
 
 
