@@ -2,7 +2,88 @@
 title: "Agriculture - World View"
 author: "Chiamaka Azodo"
 date: "2023-04-24"
-output: html_document
+output:
+  html_document:
+    toc: yes
+    toc_float:
+      collapsed: no
+  fig_width: 5
+  fig_height: 5
+  
 ---
+
+#### Packages
+```{r, include=FALSE}
+
+library(dplyr)
+library(tidyverse)
+library(janitor)
+library(ggplot2)
+library(scales)
+library(plotly)
+library(DT)
+library(highcharter)
+
+```
+
+#### Data Upload
+```{r, include=FALSE}
+
+# Set working directory
+setwd("/Users/chiamakaazodo/Documents/data_vis_2023/Group_E_Agriculture")
+
+# Upload the U.S. world wide agricultural trade partners data set
+
+trade_partners <- read.csv('data/FAO_Data/FAO_data_US_import_export_partners_2001-2021_crops_A-D.csv')
+
+# Upload the U.S. crop trade value data set
+
+trade_value <- read.csv('data/FAO_Data/FAO_data_import_export_crops_A-D_valueovertime_2001-2021.csv')
+
+# Clean up the column names of the datasets
+trade_partners <- clean_names(trade_partners)
+trade_value <- clean_names(trade_value)
+
+summary(trade_partners)
+summary(trade_value)
+
+```
+
+
+#### U.S. Agriculture Trade Section Description
+
+This section/tab of the project website will focus on the agricultural trade relationships for different crops. Import and export quantity of the crops will be used to understand the established trade networks the United States has for each crop. 
+
+This tab will include 5 charts/visuals:
+
+* **Import quantity network analysis:** This interactive network visual will show the trade relationship for crops being imported into the United States. Users will have the ability to toggle crop and year, to be able to see a trade network for each crop for each year. They would be able to hover and see import quantity in tones.
+
+* **Export quantity network analysis:** Similar to the import quantity chart but with export data. The crop and year toggle updates both the import and export charts.
+
+* **Trade quantity over time:** This interactive line chart will show the import and export quantity in the United States over time (annual) for user selected crops. User will be able to select a crop and see two lines one representing export quantity and the other import quantity, with the ability to toggle view of each line. They will be able to hover to see the exact value.
+
+* **Top 10 Imports:** This bar chart will include the top 10 crops imported in the U.S. for each user selected year. Hover will show the exact quantity.
+
+* **Top 10 Exports:** This bar chart will include the top 10 crops exported from the U.S. for each user selected year. Hover will show the exact quantity.
+
+#### Data Setup 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
