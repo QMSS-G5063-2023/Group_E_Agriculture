@@ -23,16 +23,11 @@ library(scales)
 library(plotly)
 library(DT)
 library(highcharter)
+# library(igraph)
+library(tidygraph)
+library(ggraph)
 
-## Load packages for network analysis
-library(dplyr)         # data munging
-library(igraph)        # work with graphs in R
-library(ggnetwork)     # devtools::install_github("briatte/ggnetwork")
-library(intergraph)    # ggnetwork needs this to wield igraph things
-library(ggrepel)       # fancy, non-ovelapping labels
-library(svgPanZoom)    # zoom, zoom
-library(SVGAnnotation) # to help svgPanZoom; it's a bioconductor package
-library(widgetframe)   # embed html widgets inside iframes
+
 
 ```
 
@@ -103,9 +98,54 @@ import_trade_partners
 
 #### Import Quantity Network Analysis
 
-```{r}
+```{r Data Setup}
+
+# In this data set, the nodes are the reporter_countries and partner_countries columns and value column is the edge weight 
+# Code instruction set up source: http://www.sthda.com/english/articles/33-social-network-analysis/135-network-visualization-essentials-in-r/
+
+#### Create Nodes List
+
+# Select the distinct reporter countries in this case its all U.S.
+report_country <- import_trade_partners %>%
+  distinct(reporter_countries) %>%
+  rename(label = reporter_countries)
+
+# Select the distinct partner countries
+partner_country <- import_trade_partners %>%
+  distinct(partner_countries) %>%
+  rename(label = partner_countries)
+
+# Join the two data sets to create node
+nodes <- full_join(report_country, partner_country, by = "label") 
+
+# Add unique ID for each country
+nodes <- nodes %>%
+  mutate(id = 1:nrow(nodes)) %>%
+  select(id, everything())
+head(nodes, 5)
 
 
+#### Create Edges List
+
+# Rename the value column to weight in the imports data set
+import_trade_partners <- import_trade_partners %>%
+  rename(weight = value)
+
+# (a) Join nodes id for the report countries column and rename the id column to "to"
+edges <- import_trade_partners %>% 
+  left_join(nodes, by = c("reporter_countries" = "label")) %>% 
+  rename(to = id)
+
+# (b) Join nodes id for the partner countries column and rename the id column to "from"
+edges <- edges %>% 
+  left_join(nodes, by = c("partner_countries" = "label")) %>% 
+  rename(from = id)
+
+# (c) Select only the columns "from", "to", and "weight" columns
+edges <- edges %>%
+  select(from, to, weight)
+
+head(edges, 5)
 
 
 ```
