@@ -92,7 +92,19 @@ trade_partners <- trade_partners %>%
          value) %>% 
   filter(element == "Export Quantity" | element == "Import Quantity")
 
-# 
+# For the purposes of data exploration and network analysis practice
+# Select specific variables of focus in this case year = 2018, element = import quantity, and item = banana
+
+import_trade_partners <- trade_partners %>% 
+  filter(year == 2018 & item == "Bananas" & element == "Import Quantity")
+
+import_trade_partners
+```
+
+#### Import Quantity Network Analysis
+
+```{r}
+
 
 
 
