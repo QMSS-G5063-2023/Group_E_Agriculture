@@ -24,6 +24,16 @@ library(plotly)
 library(DT)
 library(highcharter)
 
+## Load packages for network analysis
+library(dplyr)         # data munging
+library(igraph)        # work with graphs in R
+library(ggnetwork)     # devtools::install_github("briatte/ggnetwork")
+library(intergraph)    # ggnetwork needs this to wield igraph things
+library(ggrepel)       # fancy, non-ovelapping labels
+library(svgPanZoom)    # zoom, zoom
+library(SVGAnnotation) # to help svgPanZoom; it's a bioconductor package
+library(widgetframe)   # embed html widgets inside iframes
+
 ```
 
 #### Data Upload
@@ -56,9 +66,9 @@ This section/tab of the project website will focus on the agricultural trade rel
 
 This tab will include 5 charts/visuals:
 
-* **Import quantity network analysis:** This interactive network visual will show the trade relationship for crops being imported into the United States. Users will have the ability to toggle crop and year, to be able to see a trade network for each crop for each year. They would be able to hover and see import quantity in tones.
+* **Import quantity network analysis:** This interactive network visual will show the trade relationship for crops being imported into the United States. It will be a facet visual of the network across each decade 1961 - 2021. They would be able to hover and see import quantity in tones. this will answer the question of who the U.S. top trade parters are for each decade adn how that had changed over time
 
-* **Export quantity network analysis:** Similar to the import quantity chart but with export data. The crop and year toggle updates both the import and export charts.
+* **Export quantity network analysis:** Similar to the import quantity chart but with export data.  
 
 * **Trade quantity over time:** This interactive line chart will show the import and export quantity in the United States over time (annual) for user selected crops. User will be able to select a crop and see two lines one representing export quantity and the other import quantity, with the ability to toggle view of each line. They will be able to hover to see the exact value.
 
@@ -67,6 +77,26 @@ This tab will include 5 charts/visuals:
 * **Top 10 Exports:** This bar chart will include the top 10 crops exported from the U.S. for each user selected year. Hover will show the exact quantity.
 
 #### Data Setup 
+
+```{r Trade Partners Data Setup}
+
+# Select only the import and export quantity in the data set
+
+trade_partners <- trade_partners %>% 
+  select(reporter_countries,
+         partner_countries,
+         element,
+         item,
+         year,
+         unit,
+         value) %>% 
+  filter(element == "Export Quantity" | element == "Import Quantity")
+
+# 
+
+
+
+```
 
 
 
