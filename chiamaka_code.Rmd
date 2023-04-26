@@ -23,9 +23,10 @@ library(scales)
 library(plotly)
 library(DT)
 library(highcharter)
-# library(igraph)
+library(igraph)
 library(tidygraph)
 library(ggraph)
+library(visNetwork)
 
 
 
@@ -55,7 +56,7 @@ summary(trade_value)
 ```
 
 
-#### U.S. Agriculture Trade Section Description
+### U.S. Agriculture Trade Section Description
 
 This section/tab of the project website will focus on the agricultural trade relationships for different crops. Import and export quantity of the crops will be used to understand the established trade networks the United States has for each crop. 
 
@@ -71,7 +72,7 @@ This tab will include 5 charts/visuals:
 
 * **Top 10 Exports:** This bar chart will include the top 10 crops exported from the U.S. for each user selected year. Hover will show the exact quantity.
 
-#### Data Setup 
+### Data Setup 
 
 ```{r Trade Partners Data Setup}
 
@@ -96,7 +97,7 @@ import_trade_partners <- trade_partners %>%
 import_trade_partners
 ```
 
-#### Import Quantity Network Analysis
+### Import Quantity Network Analysis
 
 ```{r Data Setup}
 
@@ -149,6 +150,7 @@ head(edges, 5)
 
 
 ```
+
 ```{r Network visualization}
 # Use tidy graph to create the dataset
 net_tidy <- tbl_graph(
@@ -157,6 +159,7 @@ net_tidy <- tbl_graph(
 
 
 # Use the ggraph package to make a simple network visual
+set.seed(20) #set seed so that the visual is replicable
 
 ggraph(net_tidy, layout = "graphopt") + 
   geom_node_point() +
@@ -168,9 +171,39 @@ ggraph(net_tidy, layout = "graphopt") +
 
 ```
 
+#### Interactive Network Visualization
+
+```{r Interactive Network visualization}
+
+# Create a basic interactive network visualization using VisNetwork
+visNetwork(nodes, edges, width="100%", height="400px")
 
 
+# Improve upon the basic visual by adding specifications 
+# Learn more about specific by running ?visNodes and ?visEdges
 
+# Recreate the data frame into new names as the data frames will be adapted
+vis_nodes <- nodes
+vis_edges <- edges
+
+# Add a row to edges so that it has the same number of rows as nodes, this will be helpful later for labeling 
+#vis_edges[nrow(vis_edges) + 1,] <- list(1, 1, 20)
+
+vis_nodes$shape  <- "dot"  
+vis_nodes$shadow <- TRUE # Nodes will drop shadow
+#vis_nodes$title  <- vis_edges$weight # Text on click
+vis_nodes$label  <- vis_nodes$label # Node label
+#vis_nodes$size   <- vis_edges$weight # Node size
+vis_nodes$borderWidth <- 2 # Node border width
+
+vis_nodes$color.background <- c("#f99976")
+vis_nodes$color.border <- "black"
+vis_nodes$color.highlight.background <- "#7ac9af"
+vis_nodes$color.highlight.border <- "#7a8dbf"
+
+visNetwork(vis_nodes, vis_edges)
+
+```
 
 
 
