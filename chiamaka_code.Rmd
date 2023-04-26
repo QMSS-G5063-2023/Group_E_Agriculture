@@ -23,6 +23,11 @@ library(scales)
 library(plotly)
 library(DT)
 library(highcharter)
+# library(igraph)
+library(tidygraph)
+library(ggraph)
+
+
 
 ```
 
@@ -56,9 +61,9 @@ This section/tab of the project website will focus on the agricultural trade rel
 
 This tab will include 5 charts/visuals:
 
-* **Import quantity network analysis:** This interactive network visual will show the trade relationship for crops being imported into the United States. Users will have the ability to toggle crop and year, to be able to see a trade network for each crop for each year. They would be able to hover and see import quantity in tones.
+* **Import quantity network analysis:** This interactive network visual will show the trade relationship for crops being imported into the United States. It will be a facet visual of the network across each decade 1961 - 2021. They would be able to hover and see import quantity in tones. this will answer the question of who the U.S. top trade parters are for each decade adn how that had changed over time
 
-* **Export quantity network analysis:** Similar to the import quantity chart but with export data. The crop and year toggle updates both the import and export charts.
+* **Export quantity network analysis:** Similar to the import quantity chart but with export data.  
 
 * **Trade quantity over time:** This interactive line chart will show the import and export quantity in the United States over time (annual) for user selected crops. User will be able to select a crop and see two lines one representing export quantity and the other import quantity, with the ability to toggle view of each line. They will be able to hover to see the exact value.
 
@@ -67,6 +72,101 @@ This tab will include 5 charts/visuals:
 * **Top 10 Exports:** This bar chart will include the top 10 crops exported from the U.S. for each user selected year. Hover will show the exact quantity.
 
 #### Data Setup 
+
+```{r Trade Partners Data Setup}
+
+# Select only the import and export quantity in the data set
+
+trade_partners <- trade_partners %>% 
+  select(reporter_countries,
+         partner_countries,
+         element,
+         item,
+         year,
+         unit,
+         value) %>% 
+  filter(element == "Export Quantity" | element == "Import Quantity")
+
+# For the purposes of data exploration and network analysis practice
+# Select specific variables of focus in this case year = 2018, element = import quantity, and item = banana
+
+import_trade_partners <- trade_partners %>% 
+  filter(year == 2018 & item == "Bananas" & element == "Import Quantity")
+
+import_trade_partners
+```
+
+#### Import Quantity Network Analysis
+
+```{r Data Setup}
+
+# In this data set, the nodes are the reporter_countries and partner_countries columns and value column is the edge weight 
+# Code instruction set up source: http://www.sthda.com/english/articles/33-social-network-analysis/135-network-visualization-essentials-in-r/
+
+#### Create Nodes List
+
+# Select the distinct reporter countries in this case its all U.S.
+report_country <- import_trade_partners %>%
+  distinct(reporter_countries) %>%
+  rename(label = reporter_countries)
+
+# Select the distinct partner countries
+partner_country <- import_trade_partners %>%
+  distinct(partner_countries) %>%
+  rename(label = partner_countries)
+
+# Join the two data sets to create node
+nodes <- full_join(report_country, partner_country, by = "label") 
+
+# Add unique ID for each country
+nodes <- nodes %>%
+  mutate(id = 1:nrow(nodes)) %>%
+  select(id, everything())
+head(nodes, 5)
+
+
+#### Create Edges List
+
+# Rename the value column to weight in the imports data set
+import_trade_partners <- import_trade_partners %>%
+  rename(weight = value)
+
+# (a) Join nodes id for the report countries column and rename the id column to "to"
+edges <- import_trade_partners %>% 
+  left_join(nodes, by = c("reporter_countries" = "label")) %>% 
+  rename(to = id)
+
+# (b) Join nodes id for the partner countries column and rename the id column to "from"
+edges <- edges %>% 
+  left_join(nodes, by = c("partner_countries" = "label")) %>% 
+  rename(from = id)
+
+# (c) Select only the columns "from", "to", and "weight" columns
+edges <- edges %>%
+  select(from, to, weight)
+
+head(edges, 5)
+
+
+```
+```{r Network visualization}
+# Use tidy graph to create the dataset
+net_tidy <- tbl_graph(
+  nodes = nodes, edges = edges, directed = TRUE
+  )
+
+
+# Use the ggraph package to make a simple network visual
+
+ggraph(net_tidy, layout = "graphopt") + 
+  geom_node_point() +
+  geom_edge_link(aes(width = weight), alpha = 0.8) + 
+  scale_edge_width(range = c(0.2, 2)) +
+  geom_node_text(aes(label = label), repel = TRUE) +
+  labs(edge_width = "import_trade_partners") +
+  theme_graph()
+
+```
 
 
 
