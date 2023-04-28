@@ -76,6 +76,19 @@ for (fruit in commodities_list) {
 
 ```{r Todo}
 df
+
+# change months to month objects so they're not sorted alphabetically
+#df$Period <- factor(df$Period, levels = month.abb)
+
+# manually drop the repeated lines (if apples are given both in Lb and Ton, choose Lb)
+# stringr package
+  # new column named Unit
+    # if it contains "Ton" --> new value named Ton
+    # if it contains "Cwt" --> new value named Cwt
+    # if it contains "Lb" --> new value named Lb
+  # use Unit and Value --> new column named Adjusted.Value
+  # divide how many pounds are in 1 ton --> Ton / #
+  # divide how many pounds are in 1 cwt --> Cwt / #
 ```
 
 ```{r Make a 3-produce toy dataset}
