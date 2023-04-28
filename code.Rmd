@@ -1,0 +1,161 @@
+---
+title: "Calendar"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+install.packages("ggridges")
+install.packages("ggplot2")
+library(ggridges)
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(forcats)
+```
+
+### Loading data
+```{r}
+calendar <- read.csv("calendar.csv")
+library(DT)
+df <- calendar %>% select(Program, Year, Period, Commodity, Data.Item, Value) 
+df_cherries <- df %>% filter(Data.Item == "CHERRIES, SWEET - PRICE RECEIVED, PARITY, MEASURED IN $ / TON") 
+datatable(df)
+datatable(df_cherries)
+```
+
+```{r If we remove doubles and one-month harvests}
+filtered_df <- df %>% 
+  filter(Commodity !='ASPARAGUS') %>% # If we remove doubles 
+  filter(Commodity !='APPLES') %>% 
+  filter(Commodity !='APRICOTS') %>% 
+  filter(Commodity !='BEANS') %>% 
+  filter(Commodity !='CHERRIES') %>% 
+  filter(Commodity !='GRAPES') %>% 
+  filter(Commodity !='MELONS') %>% 
+  filter(Commodity !='NECTARINES') %>% 
+  filter(Commodity !='OLIVES') %>% 
+  filter(Commodity !='PAPAYAS') %>%
+  filter(Commodity !='PEARS') %>%
+  filter(Commodity !='PRUNES') %>%
+  filter(Commodity !='RASPBERRIES') %>%
+  filter(Commodity !='SPINACH') %>%
+  filter(Commodity !='STRAWBERRIES') %>%
+  filter(Commodity !='SWEET CORN') %>%
+  filter(Commodity !='TOMATOES') %>%
+  filter(Commodity !='ARTICHOKES') %>% # If we remove one-month harvests
+  filter(Commodity !='BEETS') %>%
+  filter(Commodity !='BLACKBERRIES') %>%
+  filter(Commodity !='BOYSENBERRIES') %>%
+  filter(Commodity !='CABBAGE') %>%
+  filter(Commodity !='CUCUMBERS') %>%
+  filter(Commodity !='EGGPLANT') %>%
+  filter(Commodity !='TOMATOES') %>%
+  filter(Commodity !='GARLIC') %>%
+  filter(Commodity !='GOOSEBERRIES') %>%
+  filter(Commodity !='LOGANBERRIES') %>%
+  filter(Commodity !='PEPPERS') %>%
+  filter(Commodity !='RASPBERRIES') %>%
+  filter(Commodity !='SPINACH') %>%
+  filter(Commodity !='TEMPLES')
+```
+
+```{r Check out our data}
+calendar
+nrow(calendar)
+commodities_list <- unique(calendar$Commodity)
+length(unique(commodities_list)) # 53 unique commodities
+length(commodities_list)
+# commodities_list 
+
+for (fruit in commodities_list) {
+  one_fruit <- calendar %>% filter(Commodity == fruit) # only 1 fruit
+  print(cat(fruit, length(unique(one_fruit$Period)))) # number of months the fruit shows up for
+}
+```
+
+```{r Todo}
+df
+```
+
+```{r Make a 3-produce toy dataset}
+toy_df <- df %>% filter(Commodity == "PECANS" | Commodity == "SWEET POTATOES" | Commodity == "BROCCOLI" | Commodity == "PAPAYAS")
+toy_df
+
+# make the value column numeric to remove commas from characters
+ toy_df<- toy_df %>% 
+  mutate_at(c("Value"), as.numeric)
+
+# change NA to 0 (not being sold)
+toy_df[is.na(toy_df)] <- 0
+
+toy_df
+```
+
+```{r Line}
+toy_df %>%
+  ggplot(aes(x = Period, 
+             y = Value, 
+             color = Commodity, 
+             group = Commodity)) +
+  geom_line(size = 1.5) +
+  geom_point(size = 4, shape = 21, fill = "white") +
+  #scale_color_manual(values = c("red", "blue")) +
+  labs(x = "Period") +
+  theme_light(base_size = 16)
+```
+
+```{r Ridgeplot}
+# basic example
+ggplot(toy_df, aes(
+    x = Period, 
+    y = Commodity, #Value, #as.numeric(Commodity), 
+    height = Value,
+    #fill = Commodity
+    )) +
+  geom_density_ridges() #+
+  #theme_ridges() + 
+  #theme(legend.position = "none")
+
+#Program, Year, Period, Commodity, Data.Item, Value
+```
+
+```{r Bin Ridgeplot Toy}
+df %>%
+  ggplot( aes(y=Commodity, 
+              x=Period,  
+              #height=Value,
+              fill=Commodity
+              )) +
+    geom_density_ridges(alpha=0.6, # transparency
+                        stat="binline", # bins
+                        binwidth = 0.5,
+                        #height=Value
+                        #bins=20
+                        ) +
+    theme_ridges() +
+    theme(
+      legend.position="none",
+      #panel.spacing = unit(0.1, "lines"),
+      #strip.text.x = element_text(size = 8)
+    ) #+ xlab("Commodity") + ylab("Month")
+
+toy_df %>%
+  ggplot( aes(y=Commodity, 
+              x=Period,  
+              #height=Value,
+              fill=Commodity
+              )) +
+    geom_density_ridges(alpha=0.6, # transparency
+                        stat="binline", # bins
+                        binwidth = 0.5,
+                        #height=Value
+                        #bins=20
+                        ) +
+    theme_ridges() +
+    theme(
+      legend.position="none",
+      #panel.spacing = unit(0.1, "lines"),
+      #strip.text.x = element_text(size = 8)
+    ) #+ xlab("Commodity") + ylab("Month")
+```
