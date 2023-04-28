@@ -65,32 +65,13 @@ ui <- fluidPage(
   ),
     fluidRow(
       column(12,
-             selectInput(
+             sliderInput(
                "year",
-               "Select a year:",
-               choices = c(
-                           "2022",
-                           "2021",
-                           "2020",
-                           "2019",
-                           "2018",
-                           "2017",
-                           "2016",
-                           "2015",
-                           "2014",
-                           "2013",
-                           "2012",
-                           "2011",
-                           "2010",
-                           "2009",
-                           "2008",
-                           "2007"
-               ),
-               selected = "2022"
+               "Year:", min = 2007, max = 2022, value = 2022, step = 1, sep = "" )
              )
       )
     )
-    )
+    
 
 
 
@@ -135,7 +116,7 @@ server <- function(input, output, session) {
       }  else {
         unit = "CWT"
       },
-      year = input$year
+      year = toString(input$year)
     )
   })
 }
