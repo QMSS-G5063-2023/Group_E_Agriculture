@@ -39,7 +39,21 @@ server <- function(input, output) {
              filter(item == input$item), 
            aes(year, value, 
                color = element, group = element)) + 
-      geom_line() 
+      geom_line() +
+      scale_x_continuous(breaks = seq(2001, 2021, 1)) +
+      #scale_y_continuous(breaks = seq(0, 40, 5)) +
+      scale_color_brewer(palette="Set2") +
+      labs(y = "Quantity of Trade (in Tonnes)", 
+           x = "Year",
+           title = "U.S. Produce Trade Over Time",
+           subtitle = "Data from trade between 2001 - 2021",
+           caption = "Source: Food and Agriculture Organization of the United Nations",
+           color = "Trade Type") +
+      theme_minimal() + 
+      theme(
+        plot.title = element_text(color = "black", size = 14, face = "bold", hjust = 0.5),
+        plot.subtitle = element_text(face = "italic", hjust = 0.5),
+        plot.caption = element_text(face = "italic"))
   })
 }
 
