@@ -1,6 +1,7 @@
 library(shiny)
 library(dplyr)
 library(ggplot2)
+library(plotly)
 library(janitor)
 
 # Upload the data set and clean the names
@@ -26,22 +27,24 @@ produce_trade <- trade_partners %>%
   summarise(value = sum(value))
 
 # Write code for interactive import/export line chart
+
 ui <- fluidPage(
   selectInput(inputId = "item", 
               label = "Choose a Produce", 
               choices = unique(produce_trade$item)), 
-  plotOutput("line")
+  plotlyOutput("line")
 )
 
+# Create server
 server <- function(input, output) {
-  output$line <- renderPlot({
-    ggplot(produce_trade %>% 
-             filter(item == input$item), 
-           aes(year, value, 
-               color = element, group = element)) + 
+  output$line <- renderPlotly({
+    p <- ggplot(produce_trade %>% 
+                  filter(item == input$item), 
+                aes(year, value, 
+                    color = element, group = element)) + 
       geom_line() +
       scale_x_continuous(breaks = seq(2001, 2021, 1)) +
-      #scale_y_continuous(breaks = seq(0, 40, 5)) +
+      scale_y_continuous(labels = function(x) format(x, scientific = FALSE)) +
       scale_color_brewer(palette="Set2") +
       labs(y = "Quantity of Trade (in Tonnes)", 
            x = "Year",
@@ -53,7 +56,12 @@ server <- function(input, output) {
       theme(
         plot.title = element_text(color = "black", size = 14, face = "bold", hjust = 0.5),
         plot.subtitle = element_text(face = "italic", hjust = 0.5),
-        plot.caption = element_text(face = "italic"))
+        plot.caption = element_text(face = "italic"),
+        axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1))
+    
+    # Convert ggplot object to plotly object
+    ggplotly(p, tooltip = c("x", "y")) %>%
+      layout(title = NULL)
   })
 }
 
