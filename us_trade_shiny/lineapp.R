@@ -63,6 +63,7 @@ server <- function(input, output) {
     ggplotly(p, tooltip = c("x", "y")) %>%
       layout(title = NULL)
   })
+  
 }
 
 # View App
