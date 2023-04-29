@@ -2,6 +2,7 @@ library(shiny)
 library(dplyr)
 library(network)
 library(ggplot2)
+library(plotly)
 
 # Load data
 # Upload the data set and clean the names
@@ -21,10 +22,10 @@ trade_partners <- trade_partners_raw %>%
 ui <- fluidPage(
   selectInput(inputId = "year",
               label = "Select year:",
-              choices = unique(trade_partners_raw$year)),
+              choices = sort(unique(trade_partners_raw$year))),
   selectInput(inputId = "produce",
               label = "Choose a Produce:",
-              choices = unique(trade_partners_raw$item)),
+              choices = sort(unique(trade_partners_raw$item))),
   plotlyOutput("network_plot")
 )
 
@@ -39,17 +40,25 @@ server <- function(input, output) {
     
     # Create network plot
     trade_net <- network::network(filtered_data[, c("partner_countries", "reporter_countries")], directed = TRUE)
-    set.edge.attribute(trade_net, "export_value", filtered_data$value)
+    set.edge.attribute(trade_net, "Import Value", filtered_data$value)
     
-    plot <- ggplot(trade_net, 
-                   aes(x, y, xend = xend, yend = yend)) +
-      geom_edges(aes(size = export_value, color = vertex.names)) +
-      geom_nodes(aes(color = vertex.names)) +
-      geom_nodelabel(aes(label = vertex.names, color = vertex.names)) +
-      labs(title = paste(input$produce, "trade in", input$year)) +
-      theme_void()
+    plot <- ggplot(trade_net,
+         aes(x, y, xend = xend, yend = yend)) +
+    geom_edges(aes(size = `Import Value`,
+                   color = vertex.names, text = paste("Import Quantity:", `Import Value`))) +
+    geom_nodes(aes(size = `Import Value`, 
+                   color = vertex.names, 
+                   text = paste("Country:", vertex.names, "<br>",
+                                "Import Quantity:", `Import Value`))) +
+    geom_nodelabel(aes(label = vertex.names, color = vertex.names)) +
+    labs(title = paste(input$produce, "trade in", input$year),
+         color = "Country") +
+    theme_void()
+  
+    ggplotly(plot, 
+             tooltip="text") %>% config(displayModeBar = F) 
     
-    ggplotly(plot)
+    
   })
 }
 
