@@ -32,6 +32,20 @@ library(ggthemes)
 library(readxl)
 library(stringr)
 library(urbnmapr)
+library(leaflet.extras)
+library(dplyr)
+library(tidyverse)
+library(janitor)
+library(ggplot2)
+library(scales)
+library(plotly)
+library(DT)
+library(highcharter)
+library(igraph)
+library(tidygraph)
+library(ggraph)
+library(visNetwork)
+library(ggimage)
 
 
 
@@ -55,31 +69,79 @@ price$item_code <- gsub("APU0400",'',price$item_code)
 price <- merge(price, price_code, by="item_code")
 
 
+#From Chiamaka's code:
+# Upload the U.S. world wide agricultural trade partners data set
+
+#trade_partners <- read.csv('data/FAO_Data/FAO_data_US_import_export_partners_2001-2021_crops_A-D.csv')
+
+# Upload the U.S. crop trade value data set
+
+#trade_value <- read.csv('data/FAO_Data/FAO_data_import_export_crops_A-D_valueovertime_2001-2021.csv')
+trade_yield <- read.csv('data/FAO_Data/FAO_data_US_annual_yield_production_2001-2021.csv')
+
+# Clean up the column names of the datasets
+#trade_partners <- clean_names(trade_partners)
+#trade_value <- clean_names(trade_value)
+trade_yield <- clean_names(trade_yield)
+
+
+
 
 ```
 
 
-### production yearly plot
+### production yearly plot - fao data 
+
+
+
 
 ```{r}
-#
-usda$Value_numeric <- as.numeric(gsub(",","",usda$Value))
 
-
-make_production_plot <- function(food,variable,fruit_veg,color,color2){
-  filter(usda, Data.Item == variable) %>% 
+trade_yield$image <-"data/emojis/Bud.png"
+make_production_plot <- function(fruit_veg, y_p,unit, icon_point="data/emojis/Bud.png"){ trade_yield %>% 
+  filter(item == fruit_veg, element == y_p, unit == unit ) %>% 
+  mutate(image = paste0("data/emojis/",icon_point,".png")) %>% 
   ggplot() + 
-    geom_line(aes(x=Year, y = Value_numeric), color=color2,size=.5) +
-    geom_point(aes(x=Year, y = Value_numeric), color=color2, size=.5) +
-    geom_text(label = emoji(fruit_veg),  size=6.5,family="EmojiOne",color=color,aes(x=Year, y = Value_numeric)) +
-   # gg_image(aes(image= fruit_veg))
-    labs(x="Year",y="Production (tons)",title=food) 
+    geom_line(aes(x=year, y = value), color="green",size=.5) +
+    geom_point(aes(x=year, y = value), color="green", size=.5) +
+    geom_image(aes(x=year, y = value,image= image,asp=.5), size=.03) +
+    labs(x="Year",y=paste0(y_p," of ",fruit_veg, " (",unit,")")) 
 
 }
 
-make_production_plot("Apple","APPLES - PRODUCTION, MEASURED IN TONS","apple","red","pink")
-make_production_plot("Pear","PEARS - PRODUCTION, MEASURED IN TONS","pear", "#255328","#82F789")
-make_production_plot("Grape","GRAPES - PRODUCTION, MEASURED IN TONS","grapes", "#255328","#82F789")
+
+make_production_plot("Apples", "Yield","hg/ha","Apples")
+make_production_plot("Apples", "Production","Tonnes","Apples")
+make_production_plot("Pears", "Yield","hg/ha","Pears")
+make_production_plot("Pears", "Production","Tonnes","Pears")
+
+
+#make_production_plot("PEARS","TONS", "pear")
+#make_production_plot("GRAPES","TONS","grapes")
+```
+
+### production yearly plot - usda
+
+```{r}
+#
+usda <- read.csv("data/USDA_Data/annual_crop_yield_and_price_2002-2023.csv")
+usda$Value_numeric <- as.numeric(gsub(",","",usda$Value))
+
+
+make_production_plot <- function(fruit_veg,unit,icon_point){
+  filter(usda, Data.Item == paste0(fruit_veg, " - PRODUCTION, MEASURED IN ", unit)) %>% 
+  ggplot() + 
+    geom_line(aes(x=Year, y = Value_numeric), color="green",size=.5) +
+    geom_point(aes(x=Year, y = Value_numeric), color="green", size=.5) +
+    geom_text(label = emoji(icon_point),  size=6.5,family="EmojiOne",color="#255328",aes(x=Year, y = Value_numeric)) +
+   # gg_image(aes(image= fruit_veg))
+    labs(x="Year",y=paste0(unit," of ",fruit_veg)) 
+
+}
+
+make_production_plot("APPLES", "LB","apple")
+make_production_plot("PEARS","TONS", "pear")
+make_production_plot("GRAPES","TONS","grapes")
 ```
 
 
@@ -128,36 +190,37 @@ make_production_map <- function(fruit_veg, unit,year) {
 
 make_production_map("PEACHES","TONS","2017")
 make_production_map("BROCCOLI","CWT","2017")
-make_production_map("APPLES","LB","2017")
-make_production_map("ORANGES, MID & NAVEL, UTILIZED","TONS","2017")
-make_production_map("CABBAGE","CWT","2017")
-make_production_map("CAULIFLOWER","CWT","2017")
-make_production_map("LEMONS, UTILIZED","TONS","2017")
-make_production_map("MELONS, WATERMELON","CWT","2017")
-make_production_map("SPINACH","CWT","2017")
-make_production_map("CARROTS","CWT","2017")
-make_production_map("ASPARAGUS","CWT","2017")
-make_production_map("BEANS, SNAP","CWT","2017")
-make_production_map("CELERY","CWT","2017")
-make_production_map("CUCUMBERS","CWT","2017")
-make_production_map("GARLIC","CWT","2017")
-make_production_map("GRAPEFRUIT, UTILIZED","TONS","2017")
-make_production_map("GRAPES","TONS","2017")
-make_production_map("LETTUCE, ROMAINE, UTILIZED","CWT","2017")
-make_production_map("MELONS, CANTALOUPE","CWT","2017")
-make_production_map("SPINACH","CWT","2017")
-make_production_map("ARTICHOKES, UTILIZED","CWT","2017")
-make_production_map("ONIONS, DRY, UTILIZED","CWT","2017")
-make_production_map("PEARS","TONS","2017")
-make_production_map("PEPPERS, BELL, UTILIZED","CWT","2017")
-make_production_map("PEPPERS, CHILE","CWT","2017")
-make_production_map("POTATOES","CWT","2017")
-make_production_map("PUMPKINS","CWT","2017")
-make_production_map("SQUASH","CWT","2017")
-make_production_map("SWEET CORN","CWT","2017")
-make_production_map("SWEET POTATOES","CWT","2017")
-make_production_map("TANGERINES, UTILIZED","TONS","2017")
-make_production_map("TOMATOES, IN THE OPEN, UTILIZED","CWT","2017")
+#make_production_map("APPLES","LB","2017")
+#make_production_map("ORANGES, MID & NAVEL, UTILIZED","TONS","2017")
+#make_production_map("CABBAGE","CWT","2017")
+#make_production_map("CAULIFLOWER","CWT","2017")
+#make_production_map("LEMONS, UTILIZED","TONS","2017")
+#make_production_map("MELONS, WATERMELON","CWT","2017")
+#make_production_map("SPINACH","CWT","2017")
+#make_production_map("CARROTS","CWT","2017")
+#make_production_map("ASPARAGUS, UTILIZED","CWT","2017")
+#make_production_map("BEANS, SNAP","CWT","2017")
+#make_production_map("CELERY","CWT","2017")
+#make_production_map("CUCUMBERS","CWT","2017")
+#make_production_map("GARLIC","CWT","2017")
+#make_production_map("GRAPEFRUIT, UTILIZED","TONS","2017")
+#make_production_map("GRAPES","TONS","2017")
+#make_production_map("LETTUCE, ROMAINE, UTILIZED","CWT","2017")
+#make_production_map("MELONS, CANTALOUP","CWT","2017")
+#make_production_map("SPINACH","CWT","2017")
+#make_production_map("ARTICHOKES, UTILIZED","CWT","2017")
+#make_production_map("ONIONS, DRY, UTILIZED","CWT","2017")
+#make_production_map("PEARS","TONS","2017")
+#make_production_map("PEPPERS, BELL, UTILIZED","CWT","2017")
+#make_production_map("PEPPERS, CHILE","CWT","2017")
+#make_production_map("POTATOES","CWT","2017")
+#make_production_map("PUMPKINS","CWT","2017")
+#make_production_map("SQUASH","CWT","2017")
+#make_production_map("SWEET CORN","CWT","2017")
+#make_production_map("SWEET POTATOES","CWT","2017")
+#make_production_map("TANGERINES, UTILIZED","TONS","2017")
+#make_production_map("TOMATOES, IN THE OPEN, UTILIZED","CWT","2017")
+
 
 ```
 
@@ -166,7 +229,7 @@ make_production_map("TOMATOES, IN THE OPEN, UTILIZED","CWT","2017")
 
 ### Maps - Leaflet 
 
-```{r}
+```{r,echo=FALSE,warning=FALSE}
 
 
 
@@ -176,62 +239,69 @@ make_production_map2 <- function(fruit_veg, unit,year) {
   data_year_map <- st_transform(data_year_map, "+proj=longlat +datum=WGS84")
   data_year_map$Value_numeric <- as.numeric(gsub(",","",data_year_map$Value))
   pal <- colorNumeric(palette = c("green","#023020"),domain=data_year_map$Value_numeric)
-  content <- paste(data_year_map$State,"<br/>",
-                 "Production:",data_year_map$Value_numeric)
+  content <- paste(data_year_map$State,
+                 " PRODUCTION:",data_year_map$Value_numeric)
   map <- leaflet(data_year_map) %>%
-   addPolygons(data = data_year_map, 
+    addPolygons(data = data_year_map, 
               fillColor = ~pal(Value_numeric), 
               fillOpacity = 1, 
               color = "#EEEEEE",
               weight = 0.5, 
-              popup = content,
-              popupOptions = labelOptions(style = list("font-weight" = "normal", padding = "3px 8px"), textsize = "15px", direction = "auto")) %>%
+              label = content)  %>%
+              #popupOptions = labelOptions(style = list("font-weight" = "normal", padding = "3px 8px"), textsize = "15px", direction = "auto")) %>%
       addLegend(position = "bottomright", 
             pal = pal, 
             values = data_year_map$Value_numeric,
             title = paste0(fruit_veg, " PRODUCED IN ", unit), 
-            opacity = 1)
+            opacity = 1)  %>%
+      setMapWidgetStyle(list(background= "white"))
    return(map)
 }
 
-
-
-
-make_production_map2("PEACHES","TONS","2017")
 make_production_map2("BROCCOLI","CWT","2017")
-make_production_map2("APPLES","LB","2017")
-make_production_map2("ORANGES, MID & NAVEL, UTILIZED","TONS","2017")
-make_production_map2("CABBAGE","CWT","2017")
-make_production_map2("CAULIFLOWER","CWT","2017")
-make_production_map2("LEMONS, UTILIZED","TONS","2017")
-make_production_map2("MELONS, WATERMELON","CWT","2017")
-#make_production_map2("SPINACH","CWT","2017")
-make_production_map2("CARROTS","CWT","2017")
-#make_production_map2("ASPARAGUS","CWT","2017")
-make_production_map2("BEANS, SNAP","CWT","2017")
-make_production_map2("CELERY","CWT","2017")
-#make_production_map2("CUCUMBERS","CWT","2017")
-make_production_map2("GARLIC","CWT","2017")
-make_production_map2("GRAPEFRUIT, UTILIZED","TONS","2017")
-make_production_map2("GRAPES","TONS","2017")
-make_production_map2("LETTUCE, ROMAINE, UTILIZED","CWT","2017")
-#make_production_map2("MELONS, CANTALOUPE","CWT","2017")
-make_production_map2("SPINACH","CWT","2017")
-make_production_map2("ARTICHOKES, UTILIZED","CWT","2017")
-make_production_map2("ONIONS, DRY, UTILIZED","CWT","2017")
-make_production_map2("PEARS","TONS","2017")
-make_production_map2("PEPPERS, BELL, UTILIZED","CWT","2017")
-make_production_map2("PEPPERS, CHILE","CWT","2017")
-make_production_map2("POTATOES","CWT","2017")
-make_production_map2("PUMPKINS","CWT","2017")
-make_production_map2("SQUASH","CWT","2017")
-make_production_map2("SWEET CORN","CWT","2017")
-make_production_map2("SWEET POTATOES","CWT","2017")
-make_production_map2("TANGERINES, UTILIZED","TONS","2017")
-make_production_map2("TOMATOES, IN THE OPEN, UTILIZED","CWT","2017")
 
 
 
 ```
+
+
+
+```{r}
+#make_production_map2("BROCCOLI","CWT","2017")
+#make_production_map2("APPLES","LB","2017")
+#make_production_map2("ORANGES, MID & NAVEL, UTILIZED","TONS","2017")
+#make_production_map2("CABBAGE","CWT","2017")
+#make_production_map2("CAULIFLOWER","CWT","2017")
+#make_production_map2("LEMONS, UTILIZED","TONS","2017")
+#make_production_map2("MELONS, WATERMELON","CWT","2017")
+#make_production_map2("CARROTS","CWT","2017")
+#make_production_map2("BEANS, SNAP","CWT","2017")
+#make_production_map2("CELERY","CWT","2017")
+#make_production_map2("GARLIC","CWT","2017")
+#make_production_map2("GRAPEFRUIT, UTILIZED","TONS","2017")
+#make_production_map2("GRAPES","TONS","2017")
+#make_production_map2("LETTUCE, ROMAINE, UTILIZED","CWT","2017")
+#make_production_map2("MELONS, CANTALOUP","CWT","2017")
+#make_production_map2("ARTICHOKES, UTILIZED","CWT","2017")
+#make_production_map2("PEARS","TONS","2017")
+#make_production_map2("PEPPERS, BELL, UTILIZED","CWT","2017")
+#make_production_map2("PEPPERS, CHILE","CWT","2017")
+#make_production_map2("PUMPKINS","CWT","2017")
+#make_production_map2("SQUASH","CWT","2017")
+#make_production_map2("SWEET CORN","CWT","2017")
+#make_production_map2("TANGERINES, UTILIZED","TONS","2017")
+#make_production_map2("TOMATOES, IN THE OPEN, UTILIZED","CWT","2017")
+#make_production_map2("ASPARAGUS, UTILIZED","CWT","2017")
+#make_production_map2("SPINACH","CWT","2017")
+#make_production_map2("CUCUMBERS","CWT","2017")
+#make_production_map2("ONIONS, DRY, UTILIZED","CWT","2017")
+#make_production_map2("POTATOES","CWT","2017")
+#make_production_map2("SWEET POTATOES","CWT","2017")
+
+
+
+```
+
+
 
 

@@ -1,6 +1,6 @@
 ## Shiny with working Leaflet maps
 #Format: https://rstudio.github.io/leaflet/shiny.html
-#Removing Green peas (different in years of data)
+
 
 library(shiny)
 library(leaflet)
@@ -27,37 +27,32 @@ ui <- fluidPage(
                "Artichokes",
                "Asparagus",
                "Broccoli",
-               "Carrots", # ONLY WORK TILL 2015 OR SO 
                "Cauliflower",
                "Celery",
                "Cherries, Sweet",
-               "Cucumbers",
-               # "Dates", (does not work for 2022) 
                "Garlic",
                "Grapes",
-               "Lemons, Utilized",
-               "Lettuce, Head",
-               "Lettuce, Leaf",
-               "Lettuce, Romaine",
-               "Melons, Cantaloup",
-               "Melons, Honeydew",
-               "Melons, Watermelon",
-               "Onions, Dry",
+              # "Lettuce, Head",
+               #"Lettuce, Leaf",
+              # "Lettuce, Romaine",
+              # "Melons, Cantaloup",
+              # "Melons, Honeydew",
+              # "Melons, Watermelon",
+              # "Onions, Dry",
                # "Orange, Mid & Navel, Utilized", 
-               "Oranges, Valencia, Utilized", 
+              # "Oranges, Valencia, Utilized", 
                "Peaches",
                "Pears",
                "Peppers, Bell",
                "Peppers, Chile",
                "Potatoes",
                "Pumpkins",
-               "Spinach",
+               # "Spinach",
                "Squash",
                "Strawberries",
-               "Sweet Corn",
-               "Sweet Potatoes",
-               "Tangerines, Utilized",
-               "Tomatoes, In the Open"
+               "Sweet Potatoes"
+               #"Tangerines, Utilized",
+               #"Tomatoes, In the Open"
              ),
              selected = "Apple"
            )
@@ -154,5 +149,11 @@ shinyApp(ui, server)
 #"Raspberries",
 #"Tangelos",
 #"Tangerines"
+# "Dates", (does not work for 2022) 
+#"Carrots", # VARIABLE CHANGES BEFORE 2015 OR SO TIO PROCESSING OR FRESH MARKET
+# "Sweet Corn", # VARIABLE CHANGES OVER YEARS
+#"Cucumbers",
+#"Lemons, Utilized",
 
-shinyApp(ui, server)
+
+
