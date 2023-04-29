@@ -28,9 +28,8 @@ library(tidygraph)
 library(ggraph)
 library(visNetwork)
 
-
-
 ```
+
 
 #### Data Upload
 ```{r, include=FALSE}
@@ -39,63 +38,135 @@ library(visNetwork)
 setwd("/Users/chiamakaazodo/Documents/data_vis_2023/Group_E_Agriculture")
 
 # Upload the U.S. world wide agricultural trade partners data set
+trade_partners_raw <- read.csv('data/FAO_Data/FAO_data_US_agriculture_trade_quantity_2001-2021.csv')
 
-trade_partners <- read.csv('data/FAO_Data/FAO_data_US_import_export_partners_2001-2021_crops_A-D.csv')
+# Clean up the column names of the data sets
+trade_partners_raw <- clean_names(trade_partners_raw)
 
-# Upload the U.S. crop trade value data set
-
-trade_value <- read.csv('data/FAO_Data/FAO_data_import_export_crops_A-D_valueovertime_2001-2021.csv')
-
-# Clean up the column names of the datasets
-trade_partners <- clean_names(trade_partners)
-trade_value <- clean_names(trade_value)
-
-summary(trade_partners)
-summary(trade_value)
+summary(trade_partners_raw)
 
 ```
 
 
 ### U.S. Agriculture Trade Section Description
 
-This section/tab of the project website will focus on the agricultural trade relationships for different crops. Import and export quantity of the crops will be used to understand the established trade networks the United States has for each crop. 
+This section/tab of the project website will focus on the agricultural trade relationships for different fruits and vegetables. Import and export quantity of the produce will be used to understand the established trade networks the United States has for each produce. 
 
-This tab will include 5 charts/visuals:
+This tab will include 5 visuals:
 
-* **Import quantity network analysis:** This interactive network visual will show the trade relationship for crops being imported into the United States. It will be a facet visual of the network across each decade 1961 - 2021. They would be able to hover and see import quantity in tones. this will answer the question of who the U.S. top trade parters are for each decade adn how that had changed over time
-
-* **Export quantity network analysis:** Similar to the import quantity chart but with export data.  
-
-* **Trade quantity over time:** This interactive line chart will show the import and export quantity in the United States over time (annual) for user selected crops. User will be able to select a crop and see two lines one representing export quantity and the other import quantity, with the ability to toggle view of each line. They will be able to hover to see the exact value.
-
-* **Top 10 Imports:** This bar chart will include the top 10 crops imported in the U.S. for each user selected year. Hover will show the exact quantity.
-
-* **Top 10 Exports:** This bar chart will include the top 10 crops exported from the U.S. for each user selected year. Hover will show the exact quantity.
 
 ### Data Setup 
 
 ```{r Trade Partners Data Setup}
 
-# Select only the import and export quantity in the data set
+# Select only the columns of interest in the dataset
 
-trade_partners <- trade_partners %>% 
+trade_partners <- trade_partners_raw %>% 
   select(reporter_countries,
          partner_countries,
          element,
          item,
          year,
-         unit,
-         value) %>% 
-  filter(element == "Export Quantity" | element == "Import Quantity")
-
-# For the purposes of data exploration and network analysis practice
-# Select specific variables of focus in this case year = 2018, element = import quantity, and item = banana
-
-import_trade_partners <- trade_partners %>% 
-  filter(year == 2018 & item == "Bananas" & element == "Import Quantity")
-
-import_trade_partners
+         value)
 ```
+
+
+### Line graph of U.S. import and export for specific produce over time
+
+```{r}
+# Aggregate the data
+produce_trade <- trade_partners %>% 
+  select(element,
+         item,
+         year,
+         value) %>% 
+filter(item == "Dates") %>% 
+group_by(element, year) %>% 
+  summarise(value = sum(value))
+
+produce_trade <- spread(produce_trade, element, value)
+produce_trade <- clean_names(produce_trade)
+
+# Create graph 
+
+h <- highchart() %>% 
+  hc_xAxis(categories = produce_trade$year,
+           title = list(text = "Year")) %>% 
+  hc_yAxis(title = list(text = "Trade Quantity in Tonnes")) %>%  
+  hc_add_series(name = "Export Quantity", 
+                data = produce_trade$export_quantity,
+                color = "#f99976") %>% 
+  hc_add_series(name = "Import Quantity", 
+                data = produce_trade$import_quantity,
+                color = "#7ac9af")
+
+
+# Add naming specfications to the graph
+h <- h %>%
+  hc_title(text = "U.S. Produce Trade Over Time",
+           margin = 20, 
+           align = "center",
+           style = list(color = "black")) %>% 
+  hc_subtitle(text = "Data from trade between 2001 - 2021",
+              align = "center",
+              style = list(color = "#black", 
+                           fontWeight = "italic")) %>% 
+  hc_credits(enabled = TRUE, # add credits
+             text = "Source: Food and Agriculture Organization of the United Nations",
+             style = list(color = "#black", 
+                           fontWeight = "italic")) %>% 
+  hc_legend(align = "right", 
+            verticalAlign = "top",
+            layout = "vertical", 
+            x = 0, 
+            y = 100) %>%
+  hc_tooltip(crosshairs = TRUE, 
+             backgroundColor = "#FCFFC5",
+             shared = TRUE, 
+             borderWidth = 4) 
+
+h
+  
+
+# Dates have an interesting trade relationship
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ### Import Quantity Network Analysis
 
