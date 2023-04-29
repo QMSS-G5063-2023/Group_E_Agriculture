@@ -56,7 +56,8 @@ server <- function(input, output) {
     # Create horizontal bar chart
     chart <- ggplot(top10_items, 
                     aes(x = fct_reorder(item, total_value), 
-                        y = total_value)) +
+                        y = total_value,
+                        text = paste("Import Qunatity:", total_value))) +
       geom_col(fill = "#f99976") +
       xlab("Produce") +
       ylab("Total Trade Quantity (in Tonnes)") +
@@ -71,7 +72,8 @@ server <- function(input, output) {
       scale_y_continuous(labels = function(x) format(x, scientific = FALSE))
     
     # Convert ggplot to plotly
-    ggplotly(chart)
+    ggplotly(chart, 
+             tooltip="text") %>% config(displayModeBar = F)
   })
   
   # Export quantity chart
@@ -90,7 +92,8 @@ server <- function(input, output) {
     # Create horizontal bar chart
     chart <- ggplot(top10_items, 
                     aes(x = fct_reorder(item, total_value), 
-                        y = total_value)) +
+                        y = total_value,
+                        text = paste("Export Qunatity:", total_value))) +
       geom_col(fill = "#7ac9af") +
       xlab("Produce") +
       ylab("Total Trade Quantity (in Tonnes)") +
@@ -105,7 +108,8 @@ server <- function(input, output) {
       scale_y_continuous(labels = function(x) format(x, scientific = FALSE))
     
     # Convert ggplot to plotly
-    ggplotly(chart)
+    ggplotly(chart, 
+             tooltip="text") %>% config(displayModeBar = F) 
   })
   
 }
