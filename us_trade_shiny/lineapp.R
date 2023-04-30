@@ -24,14 +24,14 @@ produce_trade <- trade_partners %>%
          year,
          value) %>% 
   group_by(element, item, year) %>% 
-  summarise(value = sum(value))
+  summarise(value = round(sum(value)))
 
 # Write code for interactive import/export line chart
 
 ui <- fluidPage(
   selectInput(inputId = "item", 
               label = "Choose a Produce", 
-              choices = unique(produce_trade$item)), 
+              choices = sort(unique(produce_trade$item))), 
   plotlyOutput("line")
 )
 
@@ -40,8 +40,12 @@ server <- function(input, output) {
   output$line <- renderPlotly({
     p <- ggplot(produce_trade %>% 
                   filter(item == input$item), 
-                aes(year, value, 
-                    color = element, group = element)) + 
+                aes(year, 
+                    value, 
+                    color = element, 
+                    group = element,
+                    text = paste("Year:", year, "<br>",
+                                 "Quantity:", value))) + 
       geom_line() +
       scale_x_continuous(breaks = seq(2001, 2021, 1)) +
       scale_y_continuous(labels = function(x) format(x, scientific = FALSE)) +
@@ -49,8 +53,6 @@ server <- function(input, output) {
       labs(y = "Quantity of Trade (in Tonnes)", 
            x = "Year",
            title = "U.S. Produce Trade Over Time",
-           subtitle = "Data from trade between 2001 - 2021",
-           caption = "Source: Food and Agriculture Organization of the United Nations",
            color = "Trade Type") +
       theme_minimal() + 
       theme(
@@ -60,8 +62,10 @@ server <- function(input, output) {
         axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1))
     
     # Convert ggplot object to plotly object
-    ggplotly(p, tooltip = c("x", "y")) %>%
-      layout(title = NULL)
+    ggplotly(p, tooltip = "text") %>%
+      layout(title = NULL,
+             hovermode = "x unified",
+             hoverdistance = 20) 
   })
   
 }

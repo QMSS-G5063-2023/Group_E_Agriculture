@@ -32,7 +32,7 @@ produce_trade <- trade_partners %>%
 ui <- fluidPage(
   selectInput(inputId = "year",
               label = "Select year:",
-              choices = unique(produce_trade$year)),
+              choices = sort(unique(produce_trade$year))),
   plotlyOutput("import_bar"),
   plotlyOutput("export_bar")
 )
@@ -64,10 +64,8 @@ server <- function(input, output) {
       ggtitle(paste("Top 10 Produce Imports in", input$year)) +
       theme_minimal() +
       theme(plot.title = element_text(size = 14, face = "bold"),
-            axis.text.y = element_text(size = 10),
-            axis.text.x = element_text(size = 10, angle = 45, hjust = 1),
-            axis.title.y = element_text(size = 12),
-            axis.title.x = element_text(size = 12)) +
+            axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1),
+            ) +
       coord_flip() +
       scale_y_continuous(labels = function(x) format(x, scientific = FALSE))
     
@@ -100,10 +98,8 @@ server <- function(input, output) {
       ggtitle(paste("Top 10 Produce Exports in", input$year)) +
       theme_minimal() +
       theme(plot.title = element_text(size = 14, face = "bold"),
-            axis.text.y = element_text(size = 10),
-            axis.text.x = element_text(size = 10, angle = 45, hjust = 1),
-            axis.title.y = element_text(size = 12),
-            axis.title.x = element_text(size = 12)) +
+            axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1),
+            ) +
       coord_flip() +
       scale_y_continuous(labels = function(x) format(x, scientific = FALSE))
     
