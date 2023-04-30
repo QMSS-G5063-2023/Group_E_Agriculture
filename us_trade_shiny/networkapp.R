@@ -55,7 +55,8 @@ server <- function(input, output) {
                      color = vertex.names)) +
       geom_nodelabel(aes(label = vertex.names, color = vertex.names)) +
       labs(title = paste(input$produce, "Import Trade in", input$year),
-           color = "Country") +
+           color = "Country",
+           subtitle = "Quantity in Tonnes") +
       theme_void()
     
     ggplotly(plot, 
@@ -85,7 +86,8 @@ server <- function(input, output) {
                      color = vertex.names)) +
       geom_nodelabel(aes(label = vertex.names, color = vertex.names)) +
       labs(title = paste(input$produce, "Export Trade in", input$year),
-           color = "Country") +
+           color = "Country",
+           subtitle = "Quantity in Tonnes") +
       theme_void()
     
     ggplotly(plot, 
