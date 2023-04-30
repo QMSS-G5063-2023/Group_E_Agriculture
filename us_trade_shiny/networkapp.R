@@ -45,18 +45,21 @@ server <- function(input, output) {
     plot <- ggplot(trade_net,
          aes(x, y, xend = xend, yend = yend)) +
     geom_edges(aes(size = `Import Value`,
-                   color = vertex.names, text = paste("Import Quantity:", `Import Value`))) +
-    geom_nodes(aes(size = `Import Value`, 
                    color = vertex.names, 
                    text = paste("Country:", vertex.names, "<br>",
                                 "Import Quantity:", `Import Value`))) +
+    geom_nodes(aes(size = `Import Value`, 
+                   color = vertex.names)) +
     geom_nodelabel(aes(label = vertex.names, color = vertex.names)) +
     labs(title = paste(input$produce, "trade in", input$year),
          color = "Country") +
     theme_void()
   
+    
     ggplotly(plot, 
-             tooltip="text") %>% config(displayModeBar = F) 
+             tooltip = "text") %>% 
+      layout(hovermode = "x",
+             hoverdistance = 1)
     
     
   })
