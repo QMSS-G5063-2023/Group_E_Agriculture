@@ -6,6 +6,7 @@ library(shiny)
 library(leaflet)
 library(scales)
 library(dplyr)
+library(urbnmapr)
 
 state1 <- read.csv("data/USDA_Data/state_usda_2022_2011.csv")
 state2 <- read.csv("data/USDA_Data/state_usda_2010_2002.csv")
