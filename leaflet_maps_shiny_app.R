@@ -7,15 +7,26 @@ library(leaflet)
 library(scales)
 library(dplyr)
 
-usda <- read.csv("data/USDA_Data/annual_crop_yield_and_price_2002-2023.csv")
-usda$Value_numeric <- as.numeric(gsub(",","",usda$Value))
+state1 <- read.csv("data/USDA_Data/state_usda_2022_2011.csv")
+state2 <- read.csv("data/USDA_Data/state_usda_2010_2002.csv")
+usda_state <- rbind(state1, state2)
+
+#make state map
+usstate_sf <- get_urbn_map("states", sf = TRUE)
+usstate_sf["State"] <- usstate_sf["state_name"]
+usstate_sf["State"] <- toupper(usstate_sf$"State")
+
+#make file with geometry data
+usda_state_maps <- merge(usstate_sf,usda_state,by="State")
+#st_transform(usda_state_maps, "+proj=longlat +datum=WGS84")
+
+usda_state_maps$Value_numeric <- as.numeric(gsub(",","",usda_state_maps$Value))
 
 
 
 ui <- fluidPage(
   leafletOutput("mymap"),
   p(),
-  #actionButton("recalc", "New points"),
   fluidRow(
     column(12,
            selectInput(

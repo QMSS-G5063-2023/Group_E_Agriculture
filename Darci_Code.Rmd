@@ -46,6 +46,8 @@ library(tidygraph)
 library(ggraph)
 library(visNetwork)
 library(ggimage)
+library(plotly)
+library(ggthemes)
 
 
 
@@ -98,22 +100,27 @@ trade_yield <- clean_names(trade_yield)
 ```{r}
 
 trade_yield$image <-"data/emojis/Bud.png"
-make_production_plot <- function(fruit_veg, y_p,unit, icon_point="data/emojis/Bud.png"){ trade_yield %>% 
+
+make_production_plot <- function(fruit_veg, y_p,unit, icon_point="Bud"){ 
+  
+  production_table <- trade_yield %>% 
   filter(item == fruit_veg, element == y_p, unit == unit ) %>% 
-  mutate(image = paste0("data/emojis/",icon_point,".png")) %>% 
-  ggplot() + 
-    geom_line(aes(x=year, y = value), color="green",size=.5) +
-    geom_point(aes(x=year, y = value), color="green", size=.5) +
-    geom_image(aes(x=year, y = value,image= image,asp=.5), size=.03) +
-    labs(x="Year",y=paste0(y_p," of ",fruit_veg, " (",unit,")")) 
+  mutate(image = paste0("data/emojis/",icon_point,".png")) 
+  
+ggplot(production_table) + 
+    geom_line(aes(x=year, y = value, color="#fc8d62"), size=.5, show.legend = FALSE) +
+    geom_point(aes(x=year, y = value), size=.5) +
+    geom_image(aes(x=year, y = value,image= image), size=.03) +
+    labs(x="Year",y=paste0(y_p," of ",fruit_veg, " (",unit,")")) + theme_minimal() + theme(axis.title.y = element_text(margin = margin(r = 20)),axis.title.x = element_text(margin = margin(t = 20))) 
 
 }
 
 
+
 make_production_plot("Apples", "Yield","hg/ha","Apples")
-make_production_plot("Apples", "Production","Tonnes","Apples")
-make_production_plot("Pears", "Yield","hg/ha","Pears")
-make_production_plot("Pears", "Production","Tonnes","Pears")
+#make_production_plot("Apples", "Production","Tonnes","Apples")
+#make_production_plot("Pears", "Yield","hg/ha","Pears")
+#make_production_plot("Pears", "Production","Tonnes","Pears")
 
 
 #make_production_plot("PEARS","TONS", "pear")
