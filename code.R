@@ -14,37 +14,58 @@ library(ggplot2)
 library(plotly)
 library(janitor)
 
+library(shinythemes)
+
+
 # Data Setup
 
-calendar <- read.csv("calendar.csv")
+calendar <- read.csv("data/calendar.csv")
 
 df <- calendar %>% select(Program, Year, Period, Commodity, Data.Item, Value) 
 
 # Define UI
 ui <- fluidPage(
-  selectInput(inputId = "produce",
-              label = "Choose a Produce:",
-              choices = sort(unique(trade_partners$item))),
-  fluidRow(
-    column(width = 6, plotlyOutput("import_plot")),
-    column(width = 6, plotlyOutput("export_plot"))
-  )
+  # App title ----
+  #titlePanel("Title of your project"),
+  
+  navbarPage("Farm stuff", 
+             theme = shinytheme("flatly"),
+             tabPanel("Chiamaka", fluid = TRUE, 
+                      # code
+             ),
+             tabPanel("Darci", fluid = TRUE, 
+                      # code
+             ),
+             tabPanel("Stella", fluid = TRUE, 
+                      mainPanel(
+                        plotOutput("plot",
+                                   width = "1200px", 
+                                   height="1000px")
+                      )
+             ),
+  ),
+
+
 )
 
 # Define server logic to display and download selected file ----
 server <- function(input, output) {
-  
-p <- df %>%
-  ggplot( aes(y=Commodity, 
-              x=Period,  
-              #height=Value,
-              fill=Value)) +
-  geom_density_ridges(alpha=0.6, # transparency
-                      stat="binline", # bins
-                      binwidth = 0.5,) + 
-  theme_ridges() +
-  theme(legend.position="none")
-
+  output$plot <- renderPlot({
+    
+    p <- df %>%
+      ggplot( aes(y=Commodity, 
+                  x=Period,  
+                  #height=stat(Value),
+                  #size = 1, # outline
+                  fill=Value)) +
+      geom_density_ridges(alpha=0.6, # transparency
+                          stat="binline", # bins
+                          binwidth = 0.5,) + 
+      theme_ridges() +
+      theme(legend.position="none")
+    
+    p
+  })
 }
 
 # Create Shiny app ----
