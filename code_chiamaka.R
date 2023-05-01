@@ -203,8 +203,12 @@ ui <- fluidPage(
                       selectInput(inputId = "year_bar",
                                   label = "Select year:",
                                   choices = sort(unique(produce_trade$year))),
-                      plotlyOutput("import_bar"),
-                      plotlyOutput("export_bar"),
+                      fluidRow(column(width = 6, plotlyOutput("import_bar",
+                                   width = "900px", 
+                                   height="500px")),
+                      column(width = 6, plotlyOutput("export_bar",
+                                   width = "900px", 
+                                   height="500px"))),
                       
                       ##### U.S. Trade Network Graph
                       selectInput(inputId = "year_net",
@@ -214,17 +218,25 @@ ui <- fluidPage(
                                   label = "Choose a Produce:",
                                   choices = sort(unique(trade_partners_raw$item))),
                       fluidRow(
-                        column(width = 6, plotlyOutput("import_net")),
-                        column(width = 6, plotlyOutput("export_net"))
+                        column(width = 6, plotlyOutput("import_net",
+                                                       width = "900px", 
+                                                       height="500px")),
+                        column(width = 6, plotlyOutput("export_net",
+                                                       width = "1000px", 
+                                                       height="500px"))
                       ),
                       
                       ##### U.S. Trade Partners Import/Export Line Graph
-                      selectInput(inputId = "produce_line",
-                                  label = "Choose a Produce:",
-                                  choices = sort(unique(trade_partners$item))),
+                      # selectInput(inputId = "produce_line",
+                      #             label = "Choose a Produce:",
+                      #             choices = sort(unique(trade_partners$item))),
                       fluidRow(
-                        column(width = 6, plotlyOutput("import_plot")),
-                        column(width = 6, plotlyOutput("export_plot"))
+                        column(width = 6, plotlyOutput("import_plot",
+                                                       width = "1000px", 
+                                                       height="500px")),
+                        column(width = 6, plotlyOutput("export_plot",
+                                                       width = "1000px", 
+                                                       height="500px"))
                       )
                       
                       
@@ -437,7 +449,7 @@ server <- function(input, output, session) {
                     color = element, 
                     group = element,
                     text = paste("Year:", year, "<br>",
-                                 "Quantity:", value))) + 
+                                 element,":", value))) + 
       geom_line() +
       scale_x_continuous(breaks = seq(2001, 2021, 1)) +
       scale_y_continuous(labels = function(x) format(x, scientific = FALSE)) +
@@ -597,7 +609,7 @@ server <- function(input, output, session) {
   output$import_plot <- renderPlotly({
     # Filter data based on produce selection and element type
     filtered_data <- trade_trend %>% 
-      filter(item == input$produce_line & element == "Import Quantity")
+      filter(item == input$produce_net & element == "Import Quantity")
     
     # Create line chart
     p <- ggplot(filtered_data, aes(x = year, y = value, color = partner_countries, group = partner_countries,
@@ -609,7 +621,7 @@ server <- function(input, output, session) {
       scale_y_continuous(labels = function(x) format(x, scientific = FALSE)) +
       labs(y = "Quantity of Trade (in Tonnes)", 
            x = "Year",
-           title = paste("U.S.", input$produce_line, "Import Trade Partners Over Time"),
+           title = paste("U.S.", input$produce_net, "Import Trade Partners Over Time"),
            color = "Country") +
       theme_minimal() + 
       theme(
@@ -627,7 +639,7 @@ server <- function(input, output, session) {
   output$export_plot <- renderPlotly({
     # Filter data based on produce selection and element type
     filtered_data <- trade_trend %>% 
-      filter(item == input$produce_line & element == "Export Quantity")
+      filter(item == input$produce_net & element == "Export Quantity")
     
     # Create line chart
     p <- ggplot(filtered_data, aes(x = year, y = value, color = partner_countries, group = partner_countries,
