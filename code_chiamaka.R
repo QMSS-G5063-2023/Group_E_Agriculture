@@ -203,8 +203,12 @@ ui <- fluidPage(
                       selectInput(inputId = "year_bar",
                                   label = "Select year:",
                                   choices = sort(unique(produce_trade$year))),
-                      plotlyOutput("import_bar"),
-                      plotlyOutput("export_bar"),
+                      fluidRow(column(width = 6, plotlyOutput("import_bar",
+                                   width = "900px", 
+                                   height="500px")),
+                      column(width = 6, plotlyOutput("export_bar",
+                                   width = "900px", 
+                                   height="500px"))),
                       
                       ##### U.S. Trade Network Graph
                       selectInput(inputId = "year_net",
@@ -214,8 +218,12 @@ ui <- fluidPage(
                                   label = "Choose a Produce:",
                                   choices = sort(unique(trade_partners_raw$item))),
                       fluidRow(
-                        column(width = 6, plotlyOutput("import_net")),
-                        column(width = 6, plotlyOutput("export_net"))
+                        column(width = 6, plotlyOutput("import_net",
+                                                       width = "900px", 
+                                                       height="500px")),
+                        column(width = 6, plotlyOutput("export_net",
+                                                       width = "1000px", 
+                                                       height="500px"))
                       ),
                       
                       ##### U.S. Trade Partners Import/Export Line Graph
@@ -223,8 +231,12 @@ ui <- fluidPage(
                                   label = "Choose a Produce:",
                                   choices = sort(unique(trade_partners$item))),
                       fluidRow(
-                        column(width = 6, plotlyOutput("import_plot")),
-                        column(width = 6, plotlyOutput("export_plot"))
+                        column(width = 6, plotlyOutput("import_plot",
+                                                       width = "1000px", 
+                                                       height="500px")),
+                        column(width = 6, plotlyOutput("export_plot",
+                                                       width = "1000px", 
+                                                       height="500px"))
                       )
                       
                       
@@ -437,7 +449,7 @@ server <- function(input, output, session) {
                     color = element, 
                     group = element,
                     text = paste("Year:", year, "<br>",
-                                 "Quantity:", value))) + 
+                                 element,":", value))) + 
       geom_line() +
       scale_x_continuous(breaks = seq(2001, 2021, 1)) +
       scale_y_continuous(labels = function(x) format(x, scientific = FALSE)) +
