@@ -239,7 +239,7 @@ ui <- fluidPage(
                                         '.navbar-default .btn-link:hover,.navbar-default .btn-link:focus {color: #ffc9db}'
                                         
               ))),
-             tabPanel("Home"),
+             tabPanel("Home",),
              tabPanel("U.S. Agricultural Production and Yield", fluid = TRUE, 
                       align="center",
                       plotOutput("fruit_plot",click = "plot_click", width = "600px", height="500px"),
@@ -529,7 +529,7 @@ server <- function(input, output, session) {
         fill =  Commodity
       )) +
       geom_density_ridges(bandwidth = 1,
-                          scale = 1,
+                          # scale = 1,
                           draw_baseline = FALSE,
       ) +
       labs(
