@@ -314,27 +314,15 @@ ui <- fluidPage(
                                    "Cherries, Sweet",
                                    "Garlic",
                                    "Grapes",
-                                   # "Lettuce, Head",
-                                   #"Lettuce, Leaf",
-                                   # "Lettuce, Romaine",
-                                   # "Melons, Cantaloup",
-                                   # "Melons, Honeydew",
-                                   # "Melons, Watermelon",
-                                   # "Onions, Dry",
-                                   # "Orange, Mid & Navel, Utilized",
-                                   # "Oranges, Valencia, Utilized",
                                    "Peaches",
                                    "Pears",
                                    "Peppers, Bell",
                                    "Peppers, Chile",
                                    "Potatoes",
                                    "Pumpkins",
-                                   # "Spinach",
                                    "Squash",
                                    "Strawberries",
                                    "Sweet Potatoes"
-                                   #"Tangerines, Utilized",
-                                   #"Tomatoes, In the Open"
                                  ),
                                  selected = "Apple"
                                )
