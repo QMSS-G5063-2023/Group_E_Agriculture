@@ -51,7 +51,6 @@ library(urbnmapr)
 # Import data (put all your CSVs here) #########################################
 #Calendar
 calendar <- read.csv("data/calendar.csv")
-df <- calendar %>% select(Program, Year, Period, Commodity, Data.Item, Value) 
 
 #Network data
 trade_partners_raw <- read.csv('data/FAO_Data/FAO_data_US_agriculture_trade_quantity_2001-2021.csv')
@@ -68,6 +67,46 @@ usda_state <- rbind(state1, state2)
 
 
 # Data processing ################################################################
+
+# Select months and produce of interest
+df <- calendar %>% select(Program, 
+                          Year, 
+                          Period, 
+                          Commodity, 
+                          Data.Item, 
+                          Value) 
+
+df <- df %>% 
+  filter(Commodity != "ARTICHOKES") %>%
+  filter(Commodity != "BEETS") %>%
+  filter(Commodity != "BLACKBERRIES") %>%
+  filter(Commodity != "BOYSENBERRIES") %>%
+  filter(Commodity != "CABBAGE") %>%
+  filter(Commodity != "CUCUMBERS") %>%
+  filter(Commodity != "EGGPLANT") %>%
+  filter(Commodity != "GARLIC") %>%
+  filter(Commodity != "GOOSEBERRIES") %>%
+  filter(Commodity != "LOGANBERRIES") %>%
+  filter(Commodity != "PEPPERS") %>%
+  filter(Commodity != "RASPBERRIES") %>%
+  filter(Commodity != "SPINACH") %>%
+  filter(Commodity != "TEMPLES")
+
+df$Price <- as.numeric(gsub(",", "", df$Value))
+
+df$Period <- ifelse(df$Period == "JAN", "January", df$Period)
+df$Period <- ifelse(df$Period == "FEB", "February", df$Period)
+df$Period <- ifelse(df$Period == "MAR", "March", df$Period)
+df$Period <- ifelse(df$Period == "APR", "April", df$Period)
+df$Period <- ifelse(df$Period == "MAY", "May", df$Period)
+df$Period <- ifelse(df$Period == "JUN", "June", df$Period)
+df$Period <- ifelse(df$Period == "JUL", "July", df$Period)
+df$Period <- ifelse(df$Period == "AUG", "August", df$Period)
+df$Period <- ifelse(df$Period == "SEP", "September", df$Period)
+df$Period <- ifelse(df$Period == "OCT", "October", df$Period)
+df$Period <- ifelse(df$Period == "NOV", "November", df$Period)
+df$Period <- ifelse(df$Period == "DEC", "December", df$Period)
+df$Month <- factor(df$Period, levels = month.name)
 
 # Select columns of interest
 trade_partners <- trade_partners_raw %>% 
@@ -339,7 +378,7 @@ ui <- fluidPage(
 
              tabPanel("U.S. Agricultural Monthly Prices", fluid = TRUE, 
                       mainPanel(
-                        plotOutput("plot",
+                        plotOutput("ridgeline",
                                    width = "1200px", 
                                    height="1000px")
                       )
@@ -349,21 +388,28 @@ ui <- fluidPage(
 
 # Define server logic to display and download selected file ----
 server <- function(input, output, session) {
-  output$plot <- renderPlot({
+  output$ridgeline <- renderPlot({
     
-    p <- df %>%
-      ggplot( aes(y=Commodity, 
-                  x=Period,  
-                  #height=stat(Value),
-                  #size = 1, # outline
-                  fill=Value)) +
-      geom_density_ridges(alpha=0.6, # transparency
-                          stat="binline", # bins
-                          binwidth = 0.5,) + 
-      theme_ridges() +
-      theme(legend.position="none")
+    ridgeline <- ggplot(df, aes(
+        x = Month, 
+        y = reorder(Commodity, desc(Commodity)),
+        group = Commodity,
+        alpha = .8,
+        fill =  Commodity
+      )) +
+      geom_density_ridges(bandwidth = 1,
+                          scale = 1,
+                          draw_baseline = FALSE,
+      ) +
+      labs(
+        x = "Month",
+        y = "Produce"
+      ) +
+      scale_y_discrete(expand = c(0, 0))
+      scale_x_discrete(expand = c(0, 0))
+      coord_cartesian(clip = "off")
     
-    p
+    ridgeline
   })
   
   # Create import plot
