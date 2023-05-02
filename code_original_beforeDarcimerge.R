@@ -1,18 +1,21 @@
-#Format from: #https://shiny.rstudio.com/gallery/ncaa-swim-team-finder.html
-
-# load packages
+knitr::opts_chunk$set(echo = TRUE)
+install.packages("ggridges")
+install.packages("ggplot2")
 library(ggridges)
 library(ggplot2)
 library(dplyr)
 library(tidyr)
 library(forcats)
 library(DT)
+
 library(shiny)
 library(dplyr)
 library(ggplot2)
 library(plotly)
 library(janitor)
+
 library(shinythemes)
+
 library(shiny)
 library(leaflet)
 library(scales)
@@ -23,6 +26,7 @@ library(dplyr)
 library(ggimage)
 library(emojifont)
 library(shiny)
+#library(shinydashboard)
 library(ggplot2)
 library(stringr)
 library(forcats)
@@ -33,7 +37,7 @@ library(DT)
 library(tidyverse)
 library(leaflet)
 library(RColorBrewer)
-library(leaflegend)
+#library(leaflegend)
 library(sf)
 library(usmap)
 library(ggplot2)
@@ -56,6 +60,7 @@ library(tidygraph)
 library(ggraph)
 library(visNetwork)
 library(plotly)
+
 library(shiny)
 library(leaflet)
 library(scales)
@@ -66,19 +71,14 @@ library(urbnmapr)
 
 
 # Import data (put all your CSVs here) #########################################
-#Calendar
 calendar <- read.csv("data/calendar.csv")
+
 df <- calendar %>% select(Program, Year, Period, Commodity, Data.Item, Value) 
-
-#Network data
-trade_partners_raw <- read.csv('data/FAO_Data/FAO_data_US_agriculture_trade_quantity_2001-2021.csv')
+trade_partners_raw <- read.csv('data/FAO_data_US_agriculture_trade_quantity_2001-2021.csv')
 trade_partners_raw <- clean_names(trade_partners_raw)
-
-#Yield Plots
 trade_yield <- read.csv('data/FAO_Data/FAO_data_US_annual_yield_production_2001-2021.csv')
 trade_yield <- clean_names(trade_yield)
 
-#State maps
 state1 <- read.csv("data/USDA_Data/state_usda_2022_2011.csv")
 state2 <- read.csv("data/USDA_Data/state_usda_2010_2002.csv")
 usda_state <- rbind(state1, state2)
@@ -107,19 +107,6 @@ trade_trend <- trade_partners %>%
 
 trade_yield$image <-"data/emojis/Bud.png"
 
-#make state map
-usstate_sf <- get_urbn_map("states", sf = TRUE)
-usstate_sf["State"] <- usstate_sf["state_name"]
-usstate_sf["State"] <- toupper(usstate_sf$"State")
-
-#make file with geometry data
-usda_state_maps <- merge(usstate_sf,usda_state,by="State")
-#st_transform(usda_state_maps, "+proj=longlat +datum=WGS84")
-
-usda_state_maps$Value_numeric <- as.numeric(gsub(",","",usda_state_maps$Value))
-
-
-# Functions 
 make_production_table <- function(fruit_veg, y_p){ 
   
   production_table <- trade_yield %>% 
@@ -140,6 +127,16 @@ make_production_plot <- function(fruit_veg, y_p,unit, icon_point="Bud"){
   
 }
 
+#make state map
+usstate_sf <- get_urbn_map("states", sf = TRUE)
+usstate_sf["State"] <- usstate_sf["state_name"]
+usstate_sf["State"] <- toupper(usstate_sf$"State")
+
+#make file with geometry data
+usda_state_maps <- merge(usstate_sf,usda_state,by="State")
+#st_transform(usda_state_maps, "+proj=longlat +datum=WGS84")
+
+usda_state_maps$Value_numeric <- as.numeric(gsub(",","",usda_state_maps$Value))
 
 make_production_map2 <- function(fruit_veg, unit,year) {
   data_year <- filter(usda_state, Data.Item == paste0(fruit_veg, " - PRODUCTION, MEASURED IN ", unit),Year == year, State != "OTHER STATES")
@@ -212,12 +209,16 @@ ui <- fluidPage(
                                    "Carrots and turnips",                                                     
                                    "Castor oil seeds",                                                        
                                    "Cauliflowers and broccoli",                                               
+                                   #"Cereals n.e.c.",                                                          
                                    "Cherries",                                                                
                                    "Chick peas, dry",                                                         
+                                   #"Chillies and peppers, dry (Capsicum spp., Pimenta spp.), raw",            
+                                   #"Chillies and peppers, green (Capsicum spp. and Pimenta spp.)",            
                                    "Coffee, green",                                                           
                                    "Cow peas, dry",                                                           
                                    "Cranberries",                                                             
                                    "Cucumbers and gherkins",                                                  
+                                   #"Currants",                                                                
                                    "Dates",                                                                   
                                    "Eggplants (aubergines)",                                                  
                                    "Figs",                                                                    
@@ -301,7 +302,7 @@ ui <- fluidPage(
                       fluidRow(
                         column(12,
                                selectInput(
-                                 "fruit2",
+                                 "fruit",
                                  "Select a fruit or vegetable:",
                                  choices = c(
                                    "Apples",
@@ -314,15 +315,27 @@ ui <- fluidPage(
                                    "Cherries, Sweet",
                                    "Garlic",
                                    "Grapes",
+                                   # "Lettuce, Head",
+                                   #"Lettuce, Leaf",
+                                   # "Lettuce, Romaine",
+                                   # "Melons, Cantaloup",
+                                   # "Melons, Honeydew",
+                                   # "Melons, Watermelon",
+                                   # "Onions, Dry",
+                                   # "Orange, Mid & Navel, Utilized",
+                                   # "Oranges, Valencia, Utilized",
                                    "Peaches",
                                    "Pears",
                                    "Peppers, Bell",
                                    "Peppers, Chile",
                                    "Potatoes",
                                    "Pumpkins",
+                                   # "Spinach",
                                    "Squash",
                                    "Strawberries",
                                    "Sweet Potatoes"
+                                   #"Tangerines, Utilized",
+                                   #"Tomatoes, In the Open"
                                  ),
                                  selected = "Apple"
                                )
@@ -479,11 +492,11 @@ server <- function(input, output, session) {
   
   output$mymap <- renderLeaflet({
     make_production_map2(
-      fruit_veg = toupper(input$fruit2),
-      if (input$fruit2 == "Apples" || input$fruit2 == "Bananas") {
+      fruit_veg = toupper(input$fruit),
+      if (input$fruit == "Apples" || input$fruit == "Bananas") {
         unit = "LB" 
-      } else if (input$fruit2 == "Oranges, Mid & Navel, Utilized" || input$fruit2 == "Oranges, Valencia, Utilized" || input$fruit2 == "Lemons, Utilized" || input$fruit2 == "Grapefruit"|| input$fruit2 == "Grapes" || input$fruit2 == "Pears"|| input$fruit2 == "Tangerines, Utilized" || input$fruit2 == "Peaches" || input$fruit2 == "Apricots" || input$fruit2 == "Blueberries, Tame"||               
-                 input$fruit2 == "Cherries, Sweet" || input$fruit2 =="Cherries, Tart" || input$fruit2 =="Raspberries" || input$fruit2 =="Dates") {
+      } else if (input$fruit == "Oranges, Mid & Navel, Utilized" || input$fruit == "Oranges, Valencia, Utilized" || input$fruit == "Lemons, Utilized" || input$fruit == "Grapefruit"|| input$fruit == "Grapes" || input$fruit == "Pears"|| input$fruit == "Tangerines, Utilized" || input$fruit == "Peaches" || input$fruit == "Apricots" || input$fruit == "Blueberries, Tame"||               
+                 input$fruit == "Cherries, Sweet" || input$fruit =="Cherries, Tart" || input$fruit =="Raspberries" || input$fruit =="Dates") {
         unit = "TONS"
       }  else {
         unit = "CWT"
@@ -491,6 +504,7 @@ server <- function(input, output, session) {
       year = toString(input$year)
     )
   })
+  
 }
 
 # Create Shiny app ----
