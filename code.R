@@ -66,7 +66,7 @@ library(ggnetwork)
 
 # Import data (put all your CSVs here) #########################################
 #Calendar
-calendar <- read.csv("data/calendar.csv")
+calendar <- read.csv("data/NASS_Data/calendar.csv")
 
 #Network data
 trade_partners_raw <- read.csv('data/FAO_Data/FAO_data_US_agriculture_trade_quantity_2001-2021.csv')
@@ -242,7 +242,7 @@ ui <- fluidPage(
              tabPanel("Home",),
              tabPanel("U.S. Agricultural Production and Yield", fluid = TRUE, 
                       align="center",
-                      plotOutput("fruit_plot",click = "plot_click", width = "600px", height="500px"),
+                      plotOutput("fruit_plot",click = "plot_click", width = "600px", height="500px"), # try this
                       p(),
                       fluidRow(
                         column(12,
