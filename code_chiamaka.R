@@ -193,11 +193,46 @@ ui <- fluidPage(
              theme = shinytheme("flatly"),
              tabPanel("U.S. Agricultural Trade", fluid = TRUE, 
                       
+                      h2('Section Overview'),
+                      p('This section shows U.S. Agricultural trade at the produce level and partnership level between 2001 - 2021.'),
+                      
+                      p('At the produce level, the visuals in this section show how user specified produce U.S. 
+                        imports and exports have changed over time; and the top produce import or exports for a user specified time period.'),
+                      
+                      p('At the partnership level, the visuals in this section show which countries the U.S. is importing produce from and 
+                        exporting produce to; the strength of the partnership/relationship signified by the quantity of trade; and how those 
+                        trade relationships have changed over time.'),
+                      br(),
+                      h3('U.S. Produce Trade Over Time'),
+                      p('This interactive line graph shows the quantity of trade, both import and export, over time for each user selected produce. 
+                      A line graph was chosen to visualize this information to allow users to easily see how the relationships have changed over time. 
+                      The hover interactivity shows detail on the year and both the import and export quantity at the same time so that users can compare 
+                      without having to go back and forth and hover over each point to try and compare.
+'),
+                      br(),
+                      p('Some interesting relationships shown by this graph are for cabbages which shows that in 2010 the import quantity exceeded the export 
+                        quantity and that deviation became larger as time went on. Another interesting relationship shown is for avocados; the graph shows a 
+                        marked increase in import that began around 2011/2012 and this is inline with when Avocado Toast and avocados in general gained unprecedented 
+                        popularity and its likely that as the demand grew, the import size grew as well.'),
+                    
+                      
                       ##### U.S. Produce Trade Import/Export Line Graph
                       selectInput(inputId = "item", 
                                   label = "Choose a Produce", 
                                   choices = sort(unique(produce_trade$item))), 
                       plotlyOutput("line"),
+                      
+                      br(),
+                      h3('Top 10 U.S. Produce Import and Export'),
+                      p('These interactive bar charts show the top traded produce in the U.S. for each user selected year. The year toggle updates both the import 
+                        and export chart allowing users to have consistency without having to manually update both charts. A bar graph was chosen because it quickly 
+                        shows the top traded produce for each year without requiring much processing from the user and also allows for a quick visual scan of the other 
+                        top traded produce. The hover was included so that users get more details into the volume without trying to guess. '),
+                      br(),
+                      p('The graphs shows that in 2001 the top import was bananas at over 3 million tonnes, and the largest export was maize(corn) at over 47 million tonnes. 
+                        20 years later that relationship still holds where Bananas are the top import and maize is the top export. It is interesting to note that banana import 
+                        quantity stayed relatively the same over the time frame roughly at 4.6 million tonnes in 2021 but Maize export increased to 70 million tonnes in 2021. 
+                        For the increase in maize export, the previous line graph shows that this was not a steady increase but rather there were some fluctuating trends over time.'),
                       
                       ##### U.S. Trade Bar Graph
                       selectInput(inputId = "year_bar",
@@ -209,6 +244,31 @@ ui <- fluidPage(
                       column(width = 6, plotlyOutput("export_bar",
                                    width = "900px", 
                                    height="500px"))),
+                      
+                      br(),
+                      h3('U.S. Produce Trade Partners'),
+                      p('This interactive network visualization shows the trade relationship between the U.S. and different countries for each user specified produce and year. 
+                        The edges (lines) denote the quantity of trade from each country. This network visual was chosen to show this relationship because it allows users to 
+                        get a sense of the diversity of trade relationships the U.S. has for each produce and the strength of the trade relationship (denoted by quantity) for 
+                        each produce. The hover allows users to view the country and the quantity of trade for each produce. Because trade networks can become very concentrated 
+                        and busy, users have the ability to focus on a country of interest using the double click functionality in the legend. This allows users to be in control 
+                        of the amount of content they view. '),
+                      p('This line graphs shows the quantity of trade for each user selected produce over time. A line graph was chosen to help users to easily see how trade relationships 
+                        have changed over time. The produce toggle that updates the network graph also updated this line chart because it is likely users would want to see the full 
+                        relationship for each produce they are exploring and this way they won’t need to constantly update selection across two toggles. The hover in the line graph shows 
+                        the year, country, and trade quantity so that users see all necessary pieces of information easily. Similar to the network graph, users can double click a country 
+                        of interest in the legend to isolate the view.'),
+                      br(),
+                      p('Earlier, it was shown that the top import and export for 2021 were bananas and maize respectively. The network graph shows that in 2021 for bananas, the U.S. 
+                      imported over 1.9 million tonnes of their bananas from Guatemala. Other top import partners for bananas were Costa Rica (~810,000 tonnes) and Ecuador (~680,000 tonnes). 
+                      The line graph for the banana import relationship shows that initially Guatemala, Costa Rica and Ecuador had similar trade relationships with the U.S. but In 2007 this 
+                        changed and Guatemala steadily rose to being the largest banana import trade partner for the U.S.'),
+                      br(),
+                      p('The export trade network visual shows that for the top export, maize, the U.S. exports maize to a multiplicity of countries around the world; the U.S. largest trade 
+                        export partner in 2021 was China at approximately 18.8 million tonnes exported. The other top maize export trade partners are Mexico (16.9 million tonnes) and 
+                        Japan (11.5 million tonnes). The export trade over time line graph, reveals that the trade relationship for maize has markedly changed with China from 2019 (300,00 tonnes) to 2021 (18.8 million tonnes) 
+                        with an over 5000% increase in trade volume. Similarly for Mexico and Japan, the line graph shows a spiked increase in trade volume between 2013 and 2014 that steadily 
+                        increased over time.'),
                       
                       ##### U.S. Trade Network Graph
                       selectInput(inputId = "year_net",
@@ -651,7 +711,7 @@ server <- function(input, output, session) {
       scale_y_continuous(labels = function(x) format(x, scientific = FALSE)) +
       labs(y = "Quantity of Trade (in Tonnes)", 
            x = "Year",
-           title = paste("U.S.", input$produce_line, "Export Trade Partners Over Time"),
+           title = paste("U.S.", input$produce_net, "Export Trade Partners Over Time"),
            color = "Country") +
       theme_minimal() + 
       theme(
