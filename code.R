@@ -6,18 +6,26 @@ library(tidyr)
 library(forcats)
 library(DT)
 library(shiny)
+library(dplyr)
+library(ggplot2)
 library(plotly)
 library(janitor)
 library(shinythemes)
 library(shiny)
 library(leaflet)
 library(scales)
+library(dplyr)
+library(ggplot2)
 library(emoji)
+library(dplyr)
 library(ggimage)
 library(emojifont)
 library(shiny)
+library(ggplot2)
 library(stringr)
 library(forcats)
+library(dplyr)
+library(plotly)
 library(highcharter)
 library(DT)
 library(tidyverse)
@@ -26,24 +34,32 @@ library(RColorBrewer)
 library(leaflegend)
 library(sf)
 library(usmap)
+library(ggplot2)
 library(maps)
 library(ggthemes)
 library(readxl)
-library(urbnmapr)
+library(stringr)
 library(leaflet.extras)
+library(dplyr)
+library(tidyverse)
 library(janitor)
+library(ggplot2)
 library(scales)
+library(plotly)
 library(DT)
 library(highcharter)
 library(igraph)
 library(tidygraph)
 library(ggraph)
 library(visNetwork)
+library(plotly)
 library(shiny)
 library(leaflet)
 library(scales)
 library(dplyr)
 library(urbnmapr)
+library(network)
+library(ggnetwork)
 
 
 
@@ -68,6 +84,7 @@ usda_state <- rbind(state1, state2)
 
 # Data processing ################################################################
 
+######## Agricultural Production Map data processing #########
 # Select months and produce of interest
 df <- calendar %>% select(Program, 
                           Year, 
@@ -108,25 +125,6 @@ df$Period <- ifelse(df$Period == "NOV", "November", df$Period)
 df$Period <- ifelse(df$Period == "DEC", "December", df$Period)
 df$Month <- factor(df$Period, levels = month.name)
 
-# Select columns of interest
-trade_partners <- trade_partners_raw %>% 
-  select(reporter_countries,
-         partner_countries,
-         element,
-         item,
-         year,
-         value)
-
-# Aggregate values for import/export line chart for each country
-trade_trend <- trade_partners %>% 
-  select(element,
-         partner_countries,
-         item,
-         year,
-         value) %>% 
-  group_by(partner_countries, element, item, year) %>% 
-  summarise(value = round(sum(value)))
-
 # Create column in trade yield for emojis
 trade_yield$image <-"data/emojis/Bud.png"
 
@@ -140,6 +138,37 @@ usda_state_maps <- merge(usstate_sf,usda_state,by="State")
 #st_transform(usda_state_maps, "+proj=longlat +datum=WGS84")
 
 usda_state_maps$Value_numeric <- as.numeric(gsub(",","",usda_state_maps$Value))
+
+######## Agriculture Trade data processing #########
+# Select columns of interest
+trade_partners <- trade_partners_raw %>% 
+  select(reporter_countries,
+         partner_countries,
+         element,
+         item,
+         year,
+         value)
+
+# Aggregate values for import/export  
+produce_trade <- trade_partners %>% 
+  select(element,
+         item,
+         year,
+         value) %>% 
+  group_by(element, item, year) %>%
+  mutate(item = case_when(item == "Chillies and peppers, green (Capsicum spp. and Pimenta spp.)"  ~ "Chillies and peppers",
+                          TRUE ~ item)) %>% 
+  summarise(value = round(sum(value)))
+
+# Aggregate values for import/export line chart for each country
+trade_trend <- trade_partners %>% 
+  select(element,
+         partner_countries,
+         item,
+         year,
+         value) %>% 
+  group_by(partner_countries, element, item, year) %>% 
+  summarise(value = round(sum(value)))
 
 # Functions ################################################################
 make_production_table <- function(fruit_veg, y_p){ 
@@ -211,15 +240,6 @@ ui <- fluidPage(
                                         
               ))),
              tabPanel("Home"),
-             tabPanel("U.S. Agricultural Trade", fluid = TRUE, 
-                      selectInput(inputId = "produce",
-                                  label = "Choose a Produce:",
-                                  choices = sort(unique(trade_partners$item))),
-                      fluidRow(
-                        column(width = 6, plotlyOutput("import_plot")),
-                        column(width = 6, plotlyOutput("export_plot"))
-                      )
-             ),
              tabPanel("U.S. Agricultural Production and Yield", fluid = TRUE, 
                       align="center",
                       plotOutput("fruit_plot",click = "plot_click", width = "600px", height="500px"),
@@ -383,6 +403,117 @@ ui <- fluidPage(
                                    height="1000px")
                       )
              ),
+             tabPanel("U.S. Agricultural Trade", fluid = TRUE, 
+                      
+                      h2('Section Overview'),
+                      p('This section shows U.S. Agricultural trade at the produce level and partnership level between 2001 - 2021.'),
+                      
+                      p('At the produce level, the visuals in this section show how user specified produce U.S. 
+                        imports and exports have changed over time; and the top produce import or exports for a user specified time period.'),
+                      
+                      p('At the partnership level, the visuals in this section show which countries the U.S. is importing produce from and 
+                        exporting produce to; the strength of the partnership/relationship signified by the quantity of trade; and how those 
+                        trade relationships have changed over time.'),
+                      br(),
+                      h3('U.S. Produce Trade Over Time'),
+                      p('This interactive line graph shows the quantity of trade, both import and export, over time for each user selected produce. 
+                      A line graph was chosen to visualize this information to allow users to easily see how the relationships have changed over time. 
+                      The hover interactivity shows detail on the year and both the import and export quantity at the same time so that users can compare 
+                      without having to go back and forth and hover over each point to try and compare.
+'),
+                      br(),
+                      p('Some interesting relationships shown by this graph are for cabbages which shows that in 2010 the import quantity exceeded the export 
+                        quantity and that deviation became larger as time went on. Another interesting relationship shown is for avocados; the graph shows a 
+                        marked increase in import that began around 2011/2012 and this is inline with when Avocado Toast and avocados in general gained unprecedented 
+                        popularity and its likely that as the demand grew, the import size grew as well.'),
+                      
+                      
+                      ##### U.S. Produce Trade Import/Export Line Graph
+                      selectInput(inputId = "item", 
+                                  label = "Choose a Produce", 
+                                  choices = sort(unique(produce_trade$item))), 
+                      plotlyOutput("line"),
+                      
+                      br(),
+                      h3('Top 10 U.S. Produce Import and Export'),
+                      p('These interactive bar charts show the top traded produce in the U.S. for each user selected year. The year toggle updates both the import 
+                        and export chart allowing users to have consistency without having to manually update both charts. A bar graph was chosen because it quickly 
+                        shows the top traded produce for each year without requiring much processing from the user and also allows for a quick visual scan of the other 
+                        top traded produce. The hover was included so that users get more details into the volume without trying to guess. '),
+                      br(),
+                      p('The graphs shows that in 2001 the top import was bananas at over 3 million tonnes, and the largest export was maize(corn) at over 47 million tonnes. 
+                        20 years later that relationship still holds where Bananas are the top import and maize is the top export. It is interesting to note that banana import 
+                        quantity stayed relatively the same over the time frame roughly at 4.6 million tonnes in 2021 but Maize export increased to 70 million tonnes in 2021. 
+                        For the increase in maize export, the previous line graph shows that this was not a steady increase but rather there were some fluctuating trends over time.'),
+                      
+                      ##### U.S. Trade Bar Graph
+                      selectInput(inputId = "year_bar",
+                                  label = "Select year:",
+                                  choices = sort(unique(produce_trade$year))),
+                      fluidRow(column(width = 6, plotlyOutput("import_bar",
+                                                              width = "900px", 
+                                                              height="500px")),
+                               column(width = 6, plotlyOutput("export_bar",
+                                                              width = "900px", 
+                                                              height="500px"))),
+                      
+                      br(),
+                      h3('U.S. Produce Trade Partners'),
+                      p('This interactive network visualization shows the trade relationship between the U.S. and different countries for each user specified produce and year. 
+                        The edges (lines) denote the quantity of trade from each country. This network visual was chosen to show this relationship because it allows users to 
+                        get a sense of the diversity of trade relationships the U.S. has for each produce and the strength of the trade relationship (denoted by quantity) for 
+                        each produce. The hover allows users to view the country and the quantity of trade for each produce. Because trade networks can become very concentrated 
+                        and busy, users have the ability to focus on a country of interest using the double click functionality in the legend. This allows users to be in control 
+                        of the amount of content they view. '),
+                      p('This line graphs shows the quantity of trade for each user selected produce over time. A line graph was chosen to help users to easily see how trade relationships 
+                        have changed over time. The produce toggle that updates the network graph also updated this line chart because it is likely users would want to see the full 
+                        relationship for each produce they are exploring and this way they won’t need to constantly update selection across two toggles. The hover in the line graph shows 
+                        the year, country, and trade quantity so that users see all necessary pieces of information easily. Similar to the network graph, users can double click a country 
+                        of interest in the legend to isolate the view.'),
+                      br(),
+                      p('Earlier, it was shown that the top import and export for 2021 were bananas and maize respectively. The network graph shows that in 2021 for bananas, the U.S. 
+                      imported over 1.9 million tonnes of their bananas from Guatemala. Other top import partners for bananas were Costa Rica (~810,000 tonnes) and Ecuador (~680,000 tonnes). 
+                      The line graph for the banana import relationship shows that initially Guatemala, Costa Rica and Ecuador had similar trade relationships with the U.S. but In 2007 this 
+                        changed and Guatemala steadily rose to being the largest banana import trade partner for the U.S.'),
+                      br(),
+                      p('The export trade network visual shows that for the top export, maize, the U.S. exports maize to a multiplicity of countries around the world; the U.S. largest trade 
+                        export partner in 2021 was China at approximately 18.8 million tonnes exported. The other top maize export trade partners are Mexico (16.9 million tonnes) and 
+                        Japan (11.5 million tonnes). The export trade over time line graph, reveals that the trade relationship for maize has markedly changed with China from 2019 (300,00 tonnes) to 2021 (18.8 million tonnes) 
+                        with an over 5000% increase in trade volume. Similarly for Mexico and Japan, the line graph shows a spiked increase in trade volume between 2013 and 2014 that steadily 
+                        increased over time.'),
+                      
+                      ##### U.S. Trade Network Graph
+                      selectInput(inputId = "year_net",
+                                  label = "Select year:",
+                                  choices = sort(unique(trade_partners_raw$year))),
+                      selectInput(inputId = "produce_net",
+                                  label = "Choose a Produce:",
+                                  choices = sort(unique(trade_partners_raw$item))),
+                      fluidRow(
+                        column(width = 6, plotlyOutput("import_net",
+                                                       width = "900px", 
+                                                       height="500px")),
+                        column(width = 6, plotlyOutput("export_net",
+                                                       width = "1000px", 
+                                                       height="500px"))
+                      ),
+                      
+                      ##### U.S. Trade Partners Import/Export Line Graph
+                      # selectInput(inputId = "produce_line",
+                      #             label = "Choose a Produce:",
+                      #             choices = sort(unique(trade_partners$item))),
+                      fluidRow(
+                        column(width = 6, plotlyOutput("import_plot",
+                                                       width = "1000px", 
+                                                       height="500px")),
+                        column(width = 6, plotlyOutput("export_plot",
+                                                       width = "1000px", 
+                                                       height="500px"))
+                      )
+                      
+                      
+                      
+             ),
   ),
 )
 
@@ -412,11 +543,177 @@ server <- function(input, output, session) {
     ridgeline
   })
   
+  ###################### U.S. PRODUCE TRADE IMPORT/EXPORT LINE GRAPH CODE ####################
+  #Create standard import export line plot
+  output$line <- renderPlotly({
+    p <- ggplot(produce_trade %>% 
+                  filter(item == input$item), 
+                aes(year, 
+                    value, 
+                    color = element, 
+                    group = element,
+                    text = paste("Year:", year, "<br>",
+                                 element,":", value))) + 
+      geom_line() +
+      scale_x_continuous(breaks = seq(2001, 2021, 1)) +
+      scale_y_continuous(labels = function(x) format(x, scientific = FALSE)) +
+      scale_color_brewer(palette="Set2") +
+      labs(y = "Quantity of Trade (in Tonnes)", 
+           x = "Year",
+           title = "U.S. Produce Trade Over Time",
+           color = "Trade Type") +
+      theme_minimal() + 
+      theme(
+        plot.title = element_text(color = "black", size = 14, face = "bold", hjust = 0.5),
+        plot.subtitle = element_text(face = "italic", hjust = 0.5),
+        plot.caption = element_text(face = "italic"),
+        axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1))
+    
+    # Convert ggplot object to plotly object
+    ggplotly(p, tooltip = "text") %>%
+      layout(title = NULL,
+             hovermode = "x unified",
+             hoverdistance = 20) 
+  })
+  
+  ###################### U.S. TRADE BAR CHART CODE ####################
+  # Import quantity chart
+  output$import_bar <- renderPlotly({
+    # Filter data based on year selection and import quantity
+    filtered_data <- produce_trade %>% 
+      filter(year == input$year_bar & element =="Import Quantity")
+    
+    # Get top 10 produce items based on value
+    top10_items <- filtered_data %>% 
+      group_by(item) %>% 
+      summarize(total_value = sum(value)) %>% 
+      arrange(desc(total_value)) %>% 
+      top_n(10)
+    
+    # Create horizontal bar chart
+    chart <- ggplot(top10_items, 
+                    aes(x = fct_reorder(item, total_value), 
+                        y = total_value,
+                        text = paste("Import Qunatity:", total_value))) +
+      geom_col(fill = "#f99976") +
+      xlab("Produce") +
+      ylab("Total Trade Quantity (in Tonnes)") +
+      ggtitle(paste("Top 10 Produce Imports in", input$year_bar)) +
+      theme_minimal() +
+      theme(plot.title = element_text(size = 14, face = "bold"),
+            axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1),
+      ) +
+      coord_flip() +
+      scale_y_continuous(labels = function(x) format(x, scientific = FALSE))
+    
+    # Convert ggplot to plotly
+    ggplotly(chart, 
+             tooltip="text") %>% config(displayModeBar = F)
+  })
+  
+  # Export quantity chart
+  output$export_bar <- renderPlotly({
+    # Filter data based on year selection and export quantity
+    filtered_data <- produce_trade %>% 
+      filter(year == input$year_bar & element =="Export Quantity")
+    
+    # Get top 10 produce items based on value
+    top10_items <- filtered_data %>% 
+      group_by(item) %>% 
+      summarize(total_value = sum(value)) %>% 
+      arrange(desc(total_value)) %>% 
+      top_n(10)
+    
+    # Create horizontal bar chart
+    chart <- ggplot(top10_items, 
+                    aes(x = fct_reorder(item, total_value), 
+                        y = total_value,
+                        text = paste("Export Qunatity:", total_value))) +
+      geom_col(fill = "#7ac9af") +
+      xlab("Produce") +
+      ylab("Total Trade Quantity (in Tonnes)") +
+      ggtitle(paste("Top 10 Produce Exports in", input$year_bar)) +
+      theme_minimal() +
+      theme(plot.title = element_text(size = 14, face = "bold"),
+            axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1),
+      ) +
+      coord_flip() +
+      scale_y_continuous(labels = function(x) format(x, scientific = FALSE))
+    
+    # Convert ggplot to plotly
+    ggplotly(chart, 
+             tooltip="text") %>% config(displayModeBar = F) 
+  })
+  
+  ###################### U.S. TRADE NETWORK VISUALIZATION CODE ####################
+  output$import_net <- renderPlotly({
+    
+    # Filter data based on year and produce selection
+    filtered_data <- trade_partners_raw %>%
+      filter(year == input$year_net & item == input$produce_net & element == "Import Quantity")
+    
+    # Create network plot
+    trade_net <- network::network(filtered_data[, c("partner_countries", "reporter_countries")], directed = TRUE)
+    set.edge.attribute(trade_net, "Import Value", filtered_data$value)
+    
+    plot <- ggplot(trade_net,
+                   aes(x, y, xend = xend, yend = yend)) +
+      geom_edges(aes(size = `Import Value`,
+                     color = vertex.names,
+                     text = paste("Country:", vertex.names, "<br>",
+                                  "Import Quantity:", `Import Value`))) +
+      geom_nodes(aes(size = `Import Value`,
+                     color = vertex.names)) +
+      geom_nodelabel(aes(label = vertex.names, color = vertex.names)) +
+      labs(title = paste(input$produce_net, "Import Trade in", input$year_net),
+           color = "Country",
+           subtitle = "Quantity in Tonnes") +
+      theme_void()
+    
+    ggplotly(plot,
+             tooltip = "text") %>%
+      layout(hovermode = "x",
+             hoverdistance = 1)
+    
+  })
+  
+  output$export_net <- renderPlotly({
+    
+    # Filter data based on year and produce selection
+    filtered_data <- trade_partners_raw %>%
+      filter(year == input$year_net & item == input$produce_net & element == "Export Quantity")
+    
+    # Create network plot
+    trade_net <- network::network(filtered_data[, c("partner_countries", "reporter_countries")], directed = TRUE)
+    set.edge.attribute(trade_net, "Export Value", filtered_data$value)
+    
+    plot <- ggplot(trade_net,
+                   aes(x, y, xend = xend, yend = yend)) +
+      geom_edges(aes(size = `Export Value`,
+                     color = vertex.names,
+                     text = paste("Country:", vertex.names, "<br>",
+                                  "Export Quantity:", `Export Value`))) +
+      geom_nodes(aes(size = `Export Value`,
+                     color = vertex.names)) +
+      geom_nodelabel(aes(label = vertex.names, color = vertex.names)) +
+      labs(title = paste(input$produce_net, "Export Trade in", input$year_net),
+           color = "Country",
+           subtitle = "Quantity in Tonnes") +
+      theme_void()
+    
+    ggplotly(plot,
+             tooltip = "text") %>%
+      layout(hovermode = "x",
+             hoverdistance = 1)
+    
+  })
+  
+  ###################### U.S. PARTNERS TRADE IMPORT/EXPORT LINE GRAPH CODE ####################
   # Create import plot
   output$import_plot <- renderPlotly({
     # Filter data based on produce selection and element type
     filtered_data <- trade_trend %>% 
-      filter(item == input$produce & element == "Import Quantity")
+      filter(item == input$produce_net & element == "Import Quantity")
     
     # Create line chart
     p <- ggplot(filtered_data, aes(x = year, y = value, color = partner_countries, group = partner_countries,
@@ -428,7 +725,7 @@ server <- function(input, output, session) {
       scale_y_continuous(labels = function(x) format(x, scientific = FALSE)) +
       labs(y = "Quantity of Trade (in Tonnes)", 
            x = "Year",
-           title = paste("U.S.", input$produce, "Import Trade Partners Over Time"),
+           title = paste("U.S.", input$produce_net, "Import Trade Partners Over Time"),
            color = "Country") +
       theme_minimal() + 
       theme(
@@ -446,7 +743,7 @@ server <- function(input, output, session) {
   output$export_plot <- renderPlotly({
     # Filter data based on produce selection and element type
     filtered_data <- trade_trend %>% 
-      filter(item == input$produce & element == "Export Quantity")
+      filter(item == input$produce_net & element == "Export Quantity")
     
     # Create line chart
     p <- ggplot(filtered_data, aes(x = year, y = value, color = partner_countries, group = partner_countries,
@@ -458,7 +755,7 @@ server <- function(input, output, session) {
       scale_y_continuous(labels = function(x) format(x, scientific = FALSE)) +
       labs(y = "Quantity of Trade (in Tonnes)", 
            x = "Year",
-           title = paste("U.S.", input$produce, "Export Trade Partners Over Time"),
+           title = paste("U.S.", input$produce_net, "Export Trade Partners Over Time"),
            color = "Country") +
       theme_minimal() + 
       theme(
@@ -472,6 +769,8 @@ server <- function(input, output, session) {
       layout(title = NULL)
     
   })
+  
+  ###################### U.S. PRODUCTION MAP CODE ####################
   
   output$fruit_plot <- renderPlot({
     make_production_plot(
