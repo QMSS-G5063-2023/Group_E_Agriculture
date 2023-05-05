@@ -379,7 +379,7 @@ ui <- fluidPage(
                       fluidRow(
                         (column(width = 6,h3("Plot"),plotOutput("fruit_plot",click = "plot_click", width = "600px", height="500px"))),
                         
-                        (column(width = 6,h3("Information"),p("This plot uses data from the United Nation's Food and Agriculture Organization to show how U.S. production and yield has varied over time. Users can select a produce from the dropdown and then select either production or yield to map between 2001-2021."),tableOutput("data")))
+                        (column(width = 6,h3("Information"),p("This plot uses data from the United Nations' Food and Agriculture Organization to show how U.S. production and yield has varied over time. Users can select a produce from the dropdown and then select either production or yield to map between 2001-2021."),tableOutput("data")))
                       )
                       
                       
