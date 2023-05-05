@@ -187,6 +187,7 @@ make_production_plot <- function(fruit_veg, y_p,unit, icon_point="Bud"){
     geom_line(aes(x=year, y = value, color="#fc8d62"),size=.5, show.legend = FALSE) +
     geom_point(aes(x=year, y = value), size=.5) +
     geom_image(aes(x=year, y = value,image= image), size=.055) +
+    scale_y_continuous(labels = scales::comma) +
     labs(x="Year",y=paste0(y_p," of ",fruit_veg, " (",unit,")")) + theme_minimal() + theme(axis.title.y = element_text(margin = margin(r = 20)),axis.title.x = element_text(margin = margin(t = 20))) 
   
 }
@@ -227,19 +228,18 @@ ui <- fluidPage(
   #titlePanel("Title of your project"),
   
   navbarPage("🍉 🥝 U.S. Fruit & Veggies Exploration 🍒 🌽",
-              theme = shinytheme("flatly"), 
-              tags$head(tags$style(HTML('.navbar-static-top {background-color: #4caf50;}',
-                                        '.navbar-default .navbar-nav>.active>a {background-color: #f18bad;}',
-                                        '.navbar-nav>.active>a:hover {background-color: #f18bad;}',
-                                        '.navbar-default .navbar-nav>.active>a:focus {background-color: #f18bad;}',
-                                        '.navbar-default .navbar-nav>.active>a {background-color: #f18bad;}',
-                                        '.navbar-default .navbar-nav>li>a {color:white}',
-                                        '.navbar-default .navbar-brand:hover,.navbar-default .navbar-brand:focus {color: #ffc9db}',
-                                        '.navbar-default .navbar-nav>li>a:hover,.navbar-default .navbar-nav>li>a:focus {color: #ffc9db}',
-                                        '.navbar-default .btn-link:hover,.navbar-default .btn-link:focus {color: #ffc9db}'
-                                        
-              ))),
-             tabPanel("Home",),
+             theme = shinytheme("flatly"), 
+             tags$head(tags$style(HTML('.navbar-static-top {background-color: #4caf50;}',
+                                       '.navbar-default .navbar-nav>.active>a {background-color: #f18bad;}',
+                                       '.navbar-nav>.active>a:hover {background-color: #f18bad;}',
+                                       '.navbar-default .navbar-nav>.active>a:focus {background-color: #f18bad;}',
+                                       '.navbar-default .navbar-nav>.active>a {background-color: #f18bad;}',
+                                       '.navbar-default .navbar-nav>li>a {color:white}',
+                                       '.navbar-default .navbar-brand:hover,.navbar-default .navbar-brand:focus {color: #ffc9db}',
+                                       '.navbar-default .navbar-nav>li>a:hover,.navbar-default .navbar-nav>li>a:focus {color: #ffc9db}',
+                                       '.navbar-default .btn-link:hover,.navbar-default .btn-link:focus {color: #ffc9db}'
+                                       
+             ))),
              tabPanel("Home", fluid = TRUE,
                       align="center",
                       h2('Food for thought'),
@@ -264,14 +264,13 @@ ui <- fluidPage(
                       p("Food feeds humanity, and humanity's geopolitics impact food, with far-reaching implications."),
              ),
              tabPanel("U.S. Agricultural Production and Yield", fluid = TRUE, 
-                      align="center",
-                      plotOutput("fruit_plot",click = "plot_click", width = "600px", height="500px"), # try this
+                      h2('U.S. Agricultural Production and Yield'),
                       p(),
                       fluidRow(
-                        column(12,
+                        column(width = 6,
                                selectInput(
                                  "fruit",
-                                 "Select a fruit or vegetable:",
+                                 "Choose a Produce:",
                                  choices = c(
                                    "Almonds, in shell",                                                       
                                    "Apples",                                                                  
@@ -368,58 +367,75 @@ ui <- fluidPage(
                                  ),
                                  selected = "Apple"
                                ),
-                               radioButtons(
+                               (column(width = 6, radioButtons(
                                  "value",
-                                 "Select an output:",
+                                 "Choose an output:",
                                  choices = c("Production","Yield"),
-                                 selected = "Production")
+                                 selected = "Production")))
                         )
                       ),
-                      tableOutput("data")
+                      p("Select an emoji to see the values of that point. If the table is empty, please click closer to the center of the emoji icon."),
+                      br(),
+                      fluidRow(
+                        (column(width = 6,h3("Plot"),plotOutput("fruit_plot",click = "plot_click", width = "600px", height="500px"))),
+                        
+                        (column(width = 6,h3("Information"),p("This plot uses data from the United Nation's Food and Agriculture Organization to show how U.S. production and yield has varied over time. Users can select a produce from the dropdown and then select either production or yield to map between 2001-2021."),tableOutput("data")))
+                      )
+                      
+                      
              ),
              tabPanel("U.S. Agricultural Production Map", fluid = TRUE,
+                      h2('State Production of Produce by Year'),
+                      h3("Map"),
+                      fluidRow(
+                        (column(width=4,
+                                sliderInput(
+                                  "year",
+                                  "Year:", min = 2007, max = 2022, value = 2022, step = 1, sep = "" )
+                        )
+                        ),
+                        (column(width=6,
+                                selectInput(
+                                  "fruit2",
+                                  "Choose a Produce:",
+                                  choices = c(
+                                    "Apples",
+                                    "Apricots",
+                                    "Artichokes",
+                                    "Asparagus",
+                                    "Broccoli",
+                                    "Cauliflower",
+                                    "Celery",
+                                    "Cherries, Sweet",
+                                    "Garlic",
+                                    "Grapes",
+                                    "Peaches",
+                                    "Pears",
+                                    "Peppers, Bell",
+                                    "Peppers, Chile",
+                                    "Potatoes",
+                                    "Pumpkins",
+                                    "Squash",
+                                    #"Strawberries",
+                                    "Sweet Potatoes"
+                                  ),
+                                  selected = "Apple"
+                                )
+                        )
+                        )
+                      ),
+                      br(),
                       leafletOutput("mymap"),
-                      p(),
-                      fluidRow(
-                        column(12,
-                               selectInput(
-                                 "fruit2",
-                                 "Select a fruit or vegetable:",
-                                 choices = c(
-                                   "Apples",
-                                   "Apricots",
-                                   "Artichokes",
-                                   "Asparagus",
-                                   "Broccoli",
-                                   "Cauliflower",
-                                   "Celery",
-                                   "Cherries, Sweet",
-                                   "Garlic",
-                                   "Grapes",
-                                   "Peaches",
-                                   "Pears",
-                                   "Peppers, Bell",
-                                   "Peppers, Chile",
-                                   "Potatoes",
-                                   "Pumpkins",
-                                   "Squash",
-                                   "Strawberries",
-                                   "Sweet Potatoes"
-                                 ),
-                                 selected = "Apple"
-                               )
-                        )
-                      ),
-                      fluidRow(
-                        column(12,
-                               sliderInput(
-                                 "year",
-                                 "Year:", min = 2007, max = 2022, value = 2022, step = 1, sep = "" )
-                        )
-                      ),
-                      ),
-
+                      
+                      br(),
+                      h3("Information"),
+                      p("This map is populated using USDA data generated from the 'Quick Stats' dataset tool. It includes production information at the state level between 2007 to 2022."),
+                      br(),
+                      p("One finding that is consistent across many of the fruits and vegetables is that as time moves forward, less and less states are populated on the map. This could be a feature of the data, perhaps the threshold for inclusion in the dataset changes over time, but could also indicate that there has been consolidation over the years in which states produce certain fruits and vegetables."),
+                      br()),
+             
              tabPanel("U.S. Agricultural Monthly Prices", fluid = TRUE, 
+                      h2('U.S. Agricultural Monthly Prices'),
                       mainPanel(
                         plotOutput("ridgeline",
                                    width = "1200px", 
@@ -444,98 +460,98 @@ ui <- fluidPage(
                       The hover interactivity shows detail on the year and both the import and export quantity at the same time so that users can compare 
                       without having to go back and forth and hover over each point to try and compare.
 '),
-                      br(),
-                      p('Some interesting relationships shown by this graph are for cabbages which shows that in 2010 the import quantity exceeded the export 
+br(),
+p('Some interesting relationships shown by this graph are for cabbages which shows that in 2010 the import quantity exceeded the export 
                         quantity and that deviation became larger as time went on. Another interesting relationship shown is for avocados; the graph shows a 
                         marked increase in import that began around 2011/2012 and this is inline with when Avocado Toast and avocados in general gained unprecedented 
                         popularity and its likely that as the demand grew, the import size grew as well.'),
-                      
-                      
-                      ##### U.S. Produce Trade Import/Export Line Graph
-                      selectInput(inputId = "item", 
-                                  label = "Choose a Produce", 
-                                  choices = sort(unique(produce_trade$item))), 
-                      plotlyOutput("line"),
-                      
-                      br(),
-                      h3('Top 10 U.S. Produce Import and Export'),
-                      p('These interactive bar charts show the top traded produce in the U.S. for each user selected year. The year toggle updates both the import 
+
+
+##### U.S. Produce Trade Import/Export Line Graph
+selectInput(inputId = "item", 
+            label = "Choose a Produce", 
+            choices = sort(unique(produce_trade$item))), 
+plotlyOutput("line"),
+
+br(),
+h3('Top 10 U.S. Produce Import and Export'),
+p('These interactive bar charts show the top traded produce in the U.S. for each user selected year. The year toggle updates both the import 
                         and export chart allowing users to have consistency without having to manually update both charts. A bar graph was chosen because it quickly 
                         shows the top traded produce for each year without requiring much processing from the user and also allows for a quick visual scan of the other 
                         top traded produce. The hover was included so that users get more details into the volume without trying to guess. '),
-                      br(),
-                      p('The graphs shows that in 2001 the top import was bananas at over 3 million tonnes, and the largest export was maize(corn) at over 47 million tonnes. 
+br(),
+p('The graphs shows that in 2001 the top import was bananas at over 3 million tonnes, and the largest export was maize(corn) at over 47 million tonnes. 
                         20 years later that relationship still holds where Bananas are the top import and maize is the top export. It is interesting to note that banana import 
                         quantity stayed relatively the same over the time frame roughly at 4.6 million tonnes in 2021 but Maize export increased to 70 million tonnes in 2021. 
                         For the increase in maize export, the previous line graph shows that this was not a steady increase but rather there were some fluctuating trends over time.'),
-                      
-                      ##### U.S. Trade Bar Graph
-                      selectInput(inputId = "year_bar",
-                                  label = "Select year:",
-                                  choices = sort(unique(produce_trade$year))),
-                      fluidRow(column(width = 6, plotlyOutput("import_bar",
-                                                              width = "900px", 
-                                                              height="500px")),
-                               column(width = 6, plotlyOutput("export_bar",
-                                                              width = "900px", 
-                                                              height="500px"))),
-                      
-                      br(),
-                      h3('U.S. Produce Trade Partners'),
-                      p('This interactive network visualization shows the trade relationship between the U.S. and different countries for each user specified produce and year. 
+
+##### U.S. Trade Bar Graph
+selectInput(inputId = "year_bar",
+            label = "Select year:",
+            choices = sort(unique(produce_trade$year))),
+fluidRow(column(width = 6, plotlyOutput("import_bar",
+                                        width = "900px", 
+                                        height="500px")),
+         column(width = 6, plotlyOutput("export_bar",
+                                        width = "900px", 
+                                        height="500px"))),
+
+br(),
+h3('U.S. Produce Trade Partners'),
+p('This interactive network visualization shows the trade relationship between the U.S. and different countries for each user specified produce and year. 
                         The edges (lines) denote the quantity of trade from each country. This network visual was chosen to show this relationship because it allows users to 
                         get a sense of the diversity of trade relationships the U.S. has for each produce and the strength of the trade relationship (denoted by quantity) for 
                         each produce. The hover allows users to view the country and the quantity of trade for each produce. Because trade networks can become very concentrated 
                         and busy, users have the ability to focus on a country of interest using the double click functionality in the legend. This allows users to be in control 
                         of the amount of content they view. '),
-                      p('This line graphs shows the quantity of trade for each user selected produce over time. A line graph was chosen to help users to easily see how trade relationships 
+p('This line graphs shows the quantity of trade for each user selected produce over time. A line graph was chosen to help users to easily see how trade relationships 
                         have changed over time. The produce toggle that updates the network graph also updated this line chart because it is likely users would want to see the full 
                         relationship for each produce they are exploring and this way they won’t need to constantly update selection across two toggles. The hover in the line graph shows 
                         the year, country, and trade quantity so that users see all necessary pieces of information easily. Similar to the network graph, users can double click a country 
                         of interest in the legend to isolate the view.'),
-                      br(),
-                      p('Earlier, it was shown that the top import and export for 2021 were bananas and maize respectively. The network graph shows that in 2021 for bananas, the U.S. 
+br(),
+p('Earlier, it was shown that the top import and export for 2021 were bananas and maize respectively. The network graph shows that in 2021 for bananas, the U.S. 
                       imported over 1.9 million tonnes of their bananas from Guatemala. Other top import partners for bananas were Costa Rica (~810,000 tonnes) and Ecuador (~680,000 tonnes). 
                       The line graph for the banana import relationship shows that initially Guatemala, Costa Rica and Ecuador had similar trade relationships with the U.S. but In 2007 this 
                         changed and Guatemala steadily rose to being the largest banana import trade partner for the U.S.'),
-                      br(),
-                      p('The export trade network visual shows that for the top export, maize, the U.S. exports maize to a multiplicity of countries around the world; the U.S. largest trade 
+br(),
+p('The export trade network visual shows that for the top export, maize, the U.S. exports maize to a multiplicity of countries around the world; the U.S. largest trade 
                         export partner in 2021 was China at approximately 18.8 million tonnes exported. The other top maize export trade partners are Mexico (16.9 million tonnes) and 
                         Japan (11.5 million tonnes). The export trade over time line graph, reveals that the trade relationship for maize has markedly changed with China from 2019 (300,00 tonnes) to 2021 (18.8 million tonnes) 
                         with an over 5000% increase in trade volume. Similarly for Mexico and Japan, the line graph shows a spiked increase in trade volume between 2013 and 2014 that steadily 
                         increased over time.'),
-                      
-                      ##### U.S. Trade Network Graph
-                      selectInput(inputId = "year_net",
-                                  label = "Select year:",
-                                  choices = sort(unique(trade_partners_raw$year))),
-                      selectInput(inputId = "produce_net",
-                                  label = "Choose a Produce:",
-                                  choices = sort(unique(trade_partners_raw$item))),
-                      fluidRow(
-                        column(width = 6, plotlyOutput("import_net",
-                                                       width = "900px", 
-                                                       height="500px")),
-                        column(width = 6, plotlyOutput("export_net",
-                                                       width = "1000px", 
-                                                       height="500px"))
-                      ),
-                      
-                      ##### U.S. Trade Partners Import/Export Line Graph
-                      # selectInput(inputId = "produce_line",
-                      #             label = "Choose a Produce:",
-                      #             choices = sort(unique(trade_partners$item))),
-                      fluidRow(
-                        column(width = 6, plotlyOutput("import_plot",
-                                                       width = "1000px", 
-                                                       height="500px")),
-                        column(width = 6, plotlyOutput("export_plot",
-                                                       width = "1000px", 
-                                                       height="500px"))
-                      )
-                      
-                      
-                      
+
+##### U.S. Trade Network Graph
+selectInput(inputId = "year_net",
+            label = "Select year:",
+            choices = sort(unique(trade_partners_raw$year))),
+selectInput(inputId = "produce_net",
+            label = "Choose a Produce:",
+            choices = sort(unique(trade_partners_raw$item))),
+fluidRow(
+  column(width = 6, plotlyOutput("import_net",
+                                 width = "900px", 
+                                 height="500px")),
+  column(width = 6, plotlyOutput("export_net",
+                                 width = "1000px", 
+                                 height="500px"))
+),
+
+##### U.S. Trade Partners Import/Export Line Graph
+# selectInput(inputId = "produce_line",
+#             label = "Choose a Produce:",
+#             choices = sort(unique(trade_partners$item))),
+fluidRow(
+  column(width = 6, plotlyOutput("import_plot",
+                                 width = "1000px", 
+                                 height="500px")),
+  column(width = 6, plotlyOutput("export_plot",
+                                 width = "1000px", 
+                                 height="500px"))
+)
+
+
+
              ),
   ),
 )
@@ -545,12 +561,12 @@ server <- function(input, output, session) {
   output$ridgeline <- renderPlot({
     
     ridgeline <- ggplot(df, aes(
-        x = Month, 
-        y = reorder(Commodity, desc(Commodity)),
-        group = Commodity,
-        alpha = .8,
-        fill =  Commodity
-      )) +
+      x = Month, 
+      y = reorder(Commodity, desc(Commodity)),
+      group = Commodity,
+      alpha = .8,
+      fill =  Commodity
+    )) +
       geom_density_ridges(bandwidth = 1,
                           # scale = 1,
                           draw_baseline = FALSE,
@@ -560,8 +576,8 @@ server <- function(input, output, session) {
         y = "Produce"
       ) +
       scale_y_discrete(expand = c(0, 0))
-      scale_x_discrete(expand = c(0, 0))
-      coord_cartesian(clip = "off")
+    scale_x_discrete(expand = c(0, 0))
+    coord_cartesian(clip = "off")
     
     ridgeline
   })
@@ -805,7 +821,7 @@ server <- function(input, output, session) {
         unit = "Tonnes"
       },
       if (input$fruit == "Apples" || input$fruit == "Avocados" || input$fruit == "Bananas" || input$fruit == "Avocados" || input$fruit == "Blueberries" || 
-          input$fruit == "Cherries"|| input$fruit == "Grapes" || input$fruit == "Oranges" || input$fruit == "Olives" || input$fruit == "Sweet potatoes" ||
+          input$fruit == "Cherries"|| input$fruit == "Grapes" || input$fruit == "Oranges" || input$fruit == "Olives" || 
           input$fruit == "Pears" || input$fruit =="Pineapples" || input$fruit == "Potatoes" || input$fruit == "Tomatoes" || input$fruit == "Watermelons" || input$fruit == "Strawberries") {icon_point = input$fruit
       } 
       
@@ -836,6 +852,7 @@ server <- function(input, output, session) {
       else if (input$fruit == "Sour cherries") {icon_point = "Cherries"}
       else if (input$fruit == "Tangerines, mandarins, clementines") {icon_point = "Oranges"}
       else if (input$fruit == "Green garlic") {icon_point = "Garlic"}
+      else if (input$fruit == "Sweet potatoes") {icon_point = "Sweet Potatoes"}
       else {icon_point = "Bud"}
     )
   })
