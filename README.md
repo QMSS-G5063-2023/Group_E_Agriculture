@@ -1,6 +1,6 @@
 # Group_E_Agriculture 👨‍🌾 🚜 🌽
 
-**Members**: Stella Wong, Chiamaka Adozo, Darci Kovacs
+**Members**: Stella Wong, Chiamaka Azodo, Darci Kovacs
 
 `Patterns in U.S. and Global Produce` contains all the results of the [National Agriculture Statistics Service](https://www.nass.usda.gov/) and the [Food and Agriculture Organization of the United Nations](https://www.fao.org/faostat/en/#data/TM).
 
