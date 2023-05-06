@@ -227,24 +227,30 @@ ui <- fluidPage(
   # App title ----
   #titlePanel("Title of your project"),
   
-  navbarPage("🍉 🥝 U.S. Fruit & Veggies Exploration 🍒 🌽",
+  navbarPage("🍉 🥝 U.S. Agricultural Exploration 🥕🌽",
              theme = shinytheme("flatly"), 
              tags$head(tags$style(HTML('.navbar-static-top {background-color: #4caf50;}',
-                                       '.navbar-default .navbar-nav>.active>a {background-color: #f18bad;}',
-                                       '.navbar-nav>.active>a:hover {background-color: #f18bad;}',
-                                       '.navbar-default .navbar-nav>.active>a:focus {background-color: #f18bad;}',
-                                       '.navbar-default .navbar-nav>.active>a {background-color: #f18bad;}',
+                                       '.navbar-default .navbar-nav>.active>a {background-color: #f99976;}',
+                                       '.navbar-nav>.active>a:hover {background-color: #f99976;}',
+                                       '.navbar-default .navbar-nav>.active>a:focus {background-color: #f99976;}',
+                                       '.navbar-default .navbar-nav>.active>a {background-color: #f99976;}',
                                        '.navbar-default .navbar-nav>li>a {color:white}',
-                                       '.navbar-default .navbar-brand:hover,.navbar-default .navbar-brand:focus {color: #ffc9db}',
-                                       '.navbar-default .navbar-nav>li>a:hover,.navbar-default .navbar-nav>li>a:focus {color: #ffc9db}',
-                                       '.navbar-default .btn-link:hover,.navbar-default .btn-link:focus {color: #ffc9db}'
+                                       '.navbar-default .navbar-brand:hover,.navbar-default .navbar-brand:focus {color: #fcc6b3}',
+                                       '.navbar-default .navbar-nav>li>a:hover,.navbar-default .navbar-nav>li>a:focus {color: #fcc6b3}',
+                                       '.navbar-default .btn-link:hover,.navbar-default .btn-link:focus {color: #fcc6b3}'
                                        
              ))),
              tabPanel("Home", fluid = TRUE,
-                      align="center",
-                      h2('Food for thought'),
-                      p("Since the first rooster's crow, food and its associated culinary traditions have played a significant role in the culture of every major civilization. From childhood snacks we're nostalgic for, to the new cuisines we try together, food runs the gamut from the personal to the political."),
-                      p("Literature has often reflected on the social and cultural significance of food. Steinbeck's classic 'Grapes of Wrath' describes the exploitation and inequities experienced by migrant farmworkers during the Great Depression. In 'To the Lighthouse', Sylvia Plath writes about the three-day stew at the center of the domestic sphere. Most recently, 'Crying in H-Mart' explores a popular singer Japanese Breakfast's relationship with her family and grief, reflecting on the ways in which food can both separate us from and connect us with others."),
+                      align="left",
+                      h2('Food For Thought'),
+                      p("Since the first rooster's crow, food and its associated culinary traditions have played a significant role in the culture of 
+                        every major civilization. From childhood snacks we're nostalgic for, to the new cuisines we try together, food runs the gamut 
+                        from the personal to the political."),
+                      p("Literature has often reflected on the social and cultural significance of food. Steinbeck's classic 'Grapes of Wrath' describes 
+                        the exploitation and inequities experienced by migrant farmworkers during the Great Depression. In 'To the Lighthouse', Sylvia Plath writes 
+                        about the three-day stew at the center of the domestic sphere. Most recently, 'Crying in H-Mart' explores lead singer of Japanese Breakfast 
+                        Michelle Zauner's relationship with her family and grief, reflecting on the ways in which food can both separate us from and connect us with others."),
+                      br(),
                       img(src='grapes.jpg', 
                           align = "center",
                           style="width: 100px"),
@@ -254,16 +260,28 @@ ui <- fluidPage(
                       img(src='hmart.webp', 
                           align = "center",
                           style="width: 100px"),
+                      
                       br(),
-                      h3("Chew it over"),
-                      p('First, we take a look at American agricultural yield over the years.'),
-                      p('Then, we map produce by geographic state.'),
-                      p('Next, our calendar charts the price of seasonal fruits and vegetables over the months.'),
-                      p('Finally, we draw patterns of food distribution, as shaped by global trade dynamics.'),
+                      h2("Chew It Over: U.S. Agricultural Production and Trade"),
+                      p('The current project allows for exploration into the United States agricultural production, sale, and international trade.'),
+                      p('1.) First, we take a look at American agricultural yield over the years.'),
+                      p('2.) Then, we map produce production by geographic state.'),
+                      p('3.) Next, our calendar charts the price of seasonal fruits and vegetables over the months.'),
+                      p('4.) Finally, we draw patterns of food distribution, as shaped by global trade dynamics.'),
                       br(),
-                      p("Food feeds humanity, and humanity's geopolitics impact food, with far-reaching implications."),
+                      p(em("Food feeds humanity, and humanity's geopolitics impact food, with far-reaching implications.")),
+                      
+                      br(),
+                      h3('Authors'),
+                      p("Stella Wong, Chiamaka Azodo, Darci Kovacs"),
+                      #br(),
+                      h3("Data Sources"),
+                      tags$a(href="https://www.nass.usda.gov/", "United States Department of Agriculture"), br(),
+                      tags$a(href="https://www.fao.org/faostat/en/#data/TM", "Food and Agricultural Organization of the United Nations (Trade Data)"), br(),
+                      tags$a(href="https://www.fao.org/faostat/en/#data/QCL", "Food and Agricultural Organization of the United Nations (Production Data)"), br(),
+                      br(),
              ),
-             tabPanel("U.S. Agricultural Production and Yield", fluid = TRUE, 
+             tabPanel("U.S. Agricultural Production and Yield Trends", fluid = TRUE, 
                       h2('U.S. Agricultural Production and Yield'),
                       p(),
                       fluidRow(
@@ -434,7 +452,7 @@ ui <- fluidPage(
                       p("One finding that is consistent across many of the fruits and vegetables is that as time moves forward, less and less states are populated on the map. This could be a feature of the data, perhaps the threshold for inclusion in the dataset changes over time, but could also indicate that there has been consolidation over the years in which states produce certain fruits and vegetables."),
                       br()),
              
-             tabPanel("U.S. Agricultural Monthly Prices", fluid = TRUE, 
+             tabPanel("U.S. Agricultural Monthly Price Trends", fluid = TRUE, 
                       h2('U.S. Agricultural Monthly Prices'),
                       mainPanel(
                         plotOutput("ridgeline",
@@ -444,7 +462,7 @@ ui <- fluidPage(
              ),
              tabPanel("U.S. Agricultural Trade", fluid = TRUE, 
                       
-                      h2('Section Overview'),
+                      h2('U.S. Agricultural Trade Section Overview'),
                       p('This section shows U.S. Agricultural trade at the produce level and partnership level between 2001 - 2021.'),
                       
                       p('At the produce level, the visuals in this section show how user specified produce U.S. 
@@ -552,7 +570,14 @@ fluidRow(
 
 
 
-             ),
+
+
+
+
+             )
+
+
+
   ),
 )
 
