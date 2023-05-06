@@ -244,7 +244,7 @@ ui <- fluidPage(
                       align="center",
                       h2('Food for thought'),
                       p("Since the first rooster's crow, food and its associated culinary traditions have played a significant role in the culture of every major civilization. From childhood snacks we're nostalgic for, to the new cuisines we try together, food runs the gamut from the personal to the political."),
-                      p("Literature has often reflected on the social and cultural significance of food. Steinbeck's classic 'Grapes of Wrath' describes the exploitation and inequities experienced by migrant farmworkers during the Great Depression. In 'To the Lighthouse', Sylvia Plath writes about the three-day stew at the center of the domestic sphere. Most recently, 'Crying in H-Mart' explores a popular singer Japanese Breakfast's relationship with her family and grief, reflecting on the ways in which food can both separate us from and connect us with others."),
+                      p("Literature has often reflected on the social and cultural significance of food. Steinbeck's classic 'Grapes of Wrath' describes the exploitation and inequities experienced by migrant farmworkers during the Great Depression. In 'To the Lighthouse', Virginia Woolf writes about the three-day stew at the center of the domestic sphere. Most recently, 'Crying in H-Mart' explores a popular singer Japanese Breakfast's relationship with her family and grief, reflecting on the ways in which food can both separate us from and connect us with others."),
                       img(src='grapes.jpg', 
                           align = "center",
                           style="width: 100px"),
