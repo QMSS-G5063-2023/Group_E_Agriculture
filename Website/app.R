@@ -397,7 +397,9 @@ ui <- fluidPage(
                       fluidRow(
                         (column(width = 6,h3("Plot"),plotOutput("fruit_plot",click = "plot_click", width = "600px", height="500px"))),
                         
-                        (column(width = 6,h3("Information"),p("This plot uses data from the United Nations' Food and Agriculture Organization to show how U.S. production and yield has varied over time. Users can select a produce from the dropdown and then select either production or yield to map between 2001-2021."),tableOutput("data")))
+                        (column(width = 6,h3("Information"),p("This plot uses data from the United Nations' Food and Agriculture Organization to show how 
+                                                              U.S. production and yield has varied over time. Users can select a produce from the dropdown 
+                                                              and then select either production or yield to map between 2001-2021."),tableOutput("data")))
                       )
                       
                       
@@ -454,10 +456,22 @@ ui <- fluidPage(
              
              tabPanel("U.S. Agricultural Monthly Price Trends", fluid = TRUE, 
                       h2('U.S. Agricultural Monthly Prices'),
-                      mainPanel(
-                        plotOutput("ridgeline",
-                                   width = "1200px", 
-                                   height="1000px")
+                      # mainPanel(
+                      #   plotOutput("ridgeline",
+                      #              width = "1200px", 
+                      #              height="1000px")
+                      #   
+                      # ),
+                      fluidRow(
+                        (column(width = 6,h3("Information"),p("This produce price calendar shows the seasonal price fluctuations of select 
+                                                              produce in the United States. The data for this calendar is from the most recent 
+                                                              complete year of 2022. The results show that for some produce like oranges and carrots 
+                                                              the price is steady year round; while some produce like pecans and prunes experience seasonal 
+                                                              price fluctuations throughout the year."),
+                                
+                        (column(width = 6,h3("Produce Price Calendar"),plotOutput("ridgeline", width = "1200px", height="1000px"))))
+                        
+                        )
                       )
              ),
              tabPanel("U.S. Agricultural Trade", fluid = TRUE, 
@@ -473,13 +487,13 @@ ui <- fluidPage(
                         trade relationships have changed over time.'),
                       br(),
                       h3('U.S. Produce Trade Over Time'),
-                      p('This interactive line graph shows the quantity of trade, both import and export, over time for each user selected produce. 
+                      p(strong("Visual Description:"), 'This interactive line graph shows the quantity of trade, both import and export, over time for each user selected produce. 
                       A line graph was chosen to visualize this information to allow users to easily see how the relationships have changed over time. 
                       The hover interactivity shows detail on the year and both the import and export quantity at the same time so that users can compare 
                       without having to go back and forth and hover over each point to try and compare.
 '),
 br(),
-p('Some interesting relationships shown by this graph are for cabbages which shows that in 2010 the import quantity exceeded the export 
+p(strong("Insights:"), 'Some interesting relationships shown by this graph are for cabbages which shows that in 2010 the import quantity exceeded the export 
                         quantity and that deviation became larger as time went on. Another interesting relationship shown is for avocados; the graph shows a 
                         marked increase in import that began around 2011/2012 and this is inline with when Avocado Toast and avocados in general gained unprecedented 
                         popularity and its likely that as the demand grew, the import size grew as well.'),
@@ -493,12 +507,12 @@ plotlyOutput("line"),
 
 br(),
 h3('Top 10 U.S. Produce Import and Export'),
-p('These interactive bar charts show the top traded produce in the U.S. for each user selected year. The year toggle updates both the import 
+p(strong("Visual Description:"), 'These interactive bar charts show the top traded produce in the U.S. for each user selected year. The year toggle updates both the import 
                         and export chart allowing users to have consistency without having to manually update both charts. A bar graph was chosen because it quickly 
                         shows the top traded produce for each year without requiring much processing from the user and also allows for a quick visual scan of the other 
                         top traded produce. The hover was included so that users get more details into the volume without trying to guess. '),
 br(),
-p('The graphs shows that in 2001 the top import was bananas at over 3 million tonnes, and the largest export was maize(corn) at over 47 million tonnes. 
+p(strong("Insights:"), 'The graphs shows that in 2001 the top import was bananas at over 3 million tonnes, and the largest export was maize(corn) at over 47 million tonnes. 
                         20 years later that relationship still holds where Bananas are the top import and maize is the top export. It is interesting to note that banana import 
                         quantity stayed relatively the same over the time frame roughly at 4.6 million tonnes in 2021 but Maize export increased to 70 million tonnes in 2021. 
                         For the increase in maize export, the previous line graph shows that this was not a steady increase but rather there were some fluctuating trends over time.'),
@@ -516,7 +530,7 @@ fluidRow(column(width = 6, plotlyOutput("import_bar",
 
 br(),
 h3('U.S. Produce Trade Partners'),
-p('This interactive network visualization shows the trade relationship between the U.S. and different countries for each user specified produce and year. 
+p(strong("Visual Description:"),'This interactive network visualization shows the trade relationship between the U.S. and different countries for each user specified produce and year. 
                         The edges (lines) denote the quantity of trade from each country. This network visual was chosen to show this relationship because it allows users to 
                         get a sense of the diversity of trade relationships the U.S. has for each produce and the strength of the trade relationship (denoted by quantity) for 
                         each produce. The hover allows users to view the country and the quantity of trade for each produce. Because trade networks can become very concentrated 
@@ -528,7 +542,7 @@ p('This line graphs shows the quantity of trade for each user selected produce o
                         the year, country, and trade quantity so that users see all necessary pieces of information easily. Similar to the network graph, users can double click a country 
                         of interest in the legend to isolate the view.'),
 br(),
-p('Earlier, it was shown that the top import and export for 2021 were bananas and maize respectively. The network graph shows that in 2021 for bananas, the U.S. 
+p(strong("Insights:"), 'Earlier, it was shown that the top import and export for 2021 were bananas and maize respectively. The network graph shows that in 2021 for bananas, the U.S. 
                       imported over 1.9 million tonnes of their bananas from Guatemala. Other top import partners for bananas were Costa Rica (~810,000 tonnes) and Ecuador (~680,000 tonnes). 
                       The line graph for the banana import relationship shows that initially Guatemala, Costa Rica and Ecuador had similar trade relationships with the U.S. but In 2007 this 
                         changed and Guatemala steadily rose to being the largest banana import trade partner for the U.S.'),
