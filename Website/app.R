@@ -242,7 +242,7 @@ ui <- fluidPage(
                                        '.navbar-default .btn-link:hover,.navbar-default .btn-link:focus {color: #fcc6b3}'
                                        
              ))),
-             tabPanel("Home 🥕", fluid = TRUE,
+             tabPanel("🥕 Home", fluid = TRUE,
                       align="left",
                       h2('Food For Thought'),
                       p("Since the first rooster's crow, food and its associated culinary traditions have played a significant role in the culture of 
@@ -283,7 +283,7 @@ ui <- fluidPage(
                       tags$a(href="https://www.fao.org/faostat/en/#data/QCL", "Food and Agricultural Organization of the United Nations (Production Data)"), br(),
                       br(),
              ),
-             tabPanel("U.S. Agricultural Production and Yield Trends", fluid = TRUE, 
+             tabPanel("📊 U.S. Agricultural Production and Yield Trends", fluid = TRUE, 
                       h2('U.S. Agricultural Production and Yield'),
                       p(),
                       fluidRow(
@@ -406,7 +406,7 @@ ui <- fluidPage(
                       
                       
              ),
-             tabPanel("U.S. Agricultural Production Map", fluid = TRUE,
+             tabPanel("🗺 U.S. Agricultural Production Map️", fluid = TRUE,
                       h2('State Production of Produce by Year'),
                       h3("Map"),
                       fluidRow(
@@ -456,7 +456,7 @@ ui <- fluidPage(
                       p("One finding that is consistent across many of the fruits and vegetables is that as time moves forward, less and less states are populated on the map. This could be a feature of the data, perhaps the threshold for inclusion in the dataset changes over time, but could also indicate that there has been consolidation over the years in which states produce certain fruits and vegetables."),
                       br()),
              
-             tabPanel("U.S. Agricultural Monthly Price Trends", fluid = TRUE, 
+             tabPanel("📅 U.S. Agricultural Monthly Price Trends", fluid = TRUE, 
                       h2('U.S. Agricultural Monthly Prices'),
                       fluidRow(
                         (column(width = 6,
@@ -479,7 +479,7 @@ ui <- fluidPage(
              
              
                         
-             tabPanel("U.S. Agricultural Trade", fluid = TRUE, 
+             tabPanel("💹 U.S. Agricultural Trade", fluid = TRUE, 
                       
                       h2('U.S. Agricultural Trade Section Overview'),
                       p('This section shows U.S. Agricultural trade at the produce level and partnership level between 2001 - 2021.'),
@@ -595,7 +595,7 @@ fluidRow(
 
              ),
 
-        tabPanel("Explore the Data", fluid = TRUE, 
+        tabPanel("🔎 Explore the Data", fluid = TRUE, 
                  h2('United States Department of Agriculture'),
                  fluidRow(
                    (column(width = 6,
