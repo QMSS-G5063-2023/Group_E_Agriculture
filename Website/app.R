@@ -125,6 +125,9 @@ df$Period <- ifelse(df$Period == "NOV", "November", df$Period)
 df$Period <- ifelse(df$Period == "DEC", "December", df$Period)
 df$Month <- factor(df$Period, levels = month.name)
 
+# HERE
+datatable_df <- datatable(df)
+
 # Create column in trade yield for emojis
 trade_yield$image <-"data/emojis/Bud.png"
 
@@ -456,24 +459,27 @@ ui <- fluidPage(
              
              tabPanel("U.S. Agricultural Monthly Price Trends", fluid = TRUE, 
                       h2('U.S. Agricultural Monthly Prices'),
-                      # mainPanel(
-                      #   plotOutput("ridgeline",
-                      #              width = "1200px", 
-                      #              height="1000px")
-                      #   
-                      # ),
                       fluidRow(
-                        (column(width = 6,h3("Information"),p("This produce price calendar shows the seasonal price fluctuations of select 
-                                                              produce in the United States. The data for this calendar is from the most recent 
-                                                              complete year of 2022. The results show that for some produce like oranges and carrots 
-                                                              the price is steady year round; while some produce like pecans and prunes experience seasonal 
-                                                              price fluctuations throughout the year."),
+                        (column(width = 6,
+                                h3("Information"), 
+                                p("This produce price calendar shows the seasonal price fluctuations of select 
+                                  produce in the United States. The data for this calendar is from the most recent 
+                                  complete year of 2022. The results show that for some produce like oranges and carrots 
+                                  the price is steady year round; while some produce like pecans and prunes experience seasonal 
+                                  price fluctuations throughout the year."),
                                 
-                        (column(width = 6,h3("Produce Price Calendar"),plotOutput("ridgeline", width = "1200px", height="1000px"))))
-                        
+                        (column(width = 6,
+                                h3("Produce Price Calendar"),
+                                plotOutput("ridgeline", 
+                                           width = "1200px", 
+                                           height="1000px"))),
+                        )
                         )
                       )
              ),
+             
+             
+                        
              tabPanel("U.S. Agricultural Trade", fluid = TRUE, 
                       
                       h2('U.S. Agricultural Trade Section Overview'),
@@ -588,9 +594,28 @@ fluidRow(
 
 
 
-             )
+             ),
 
-
+        tabPanel("Explore the Data", fluid = TRUE, 
+                 h2('United States Department of Agriculture'),
+                 fluidRow(
+                   (column(width = 6,
+                           dataTableOutput("datatable_df")
+                   )),
+                 ),
+                 #  h2('Food and Agricultural Organization of the United Nations (Trade Data)'),
+                 #  fluidRow(
+                 #    (column(width = 6,
+                 #            dataTableOutput("datatable_df")
+                 #    )),
+                 #  ),
+                 # h2('Food and Agricultural Organization of the United Nations (Production Data)'),
+                 # fluidRow(
+                 #   (column(width = 6,
+                 #           dataTableOutput("datatable_df")
+                 #   )),
+                 # ),
+        ),
 
   ),
 )
@@ -620,6 +645,8 @@ server <- function(input, output, session) {
     
     ridgeline
   })
+  
+  output$datatable_df <- renderDataTable({ df })
   
   ###################### U.S. PRODUCE TRADE IMPORT/EXPORT LINE GRAPH CODE ####################
   #Create standard import export line plot
