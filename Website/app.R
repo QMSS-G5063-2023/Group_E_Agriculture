@@ -125,8 +125,12 @@ df$Period <- ifelse(df$Period == "NOV", "November", df$Period)
 df$Period <- ifelse(df$Period == "DEC", "December", df$Period)
 df$Month <- factor(df$Period, levels = month.name)
 
-# HERE
+# Create data table
 datatable_df <- datatable(df)
+# fao_trade_df <- datatable(trade_partners_raw)
+# fao_production_df <- datatable(trade_yield)
+# usda_map_df <- datatable(usda_state)
+
 
 # Create column in trade yield for emojis
 trade_yield$image <-"data/emojis/Bud.png"
@@ -596,28 +600,29 @@ fluidRow(
              ),
 
         tabPanel("🔎 Explore the Data", fluid = TRUE, 
-                 h2('United States Department of Agriculture'),
+                 h2('United States Department of Agriculture (Calendar Data)'),
                  fluidRow(
                    (column(width = 6,
                            dataTableOutput("datatable_df")
                    )),
                  ),
-                 #  h2('Food and Agricultural Organization of the United Nations (Trade Data)'),
-                 #  fluidRow(
-                 #    (column(width = 6,
-                 #            dataTableOutput("datatable_df")
-                 #    )),
-                 #  ),
+                  # h2('Food and Agricultural Organization of the United Nations (Trade Data)'),
+                  # fluidRow(
+                  #   (column(width = 6,
+                  #           dataTableOutput("fao_trade_df")
+                  #   )),
+                  # ),
                  # h2('Food and Agricultural Organization of the United Nations (Production Data)'),
                  # fluidRow(
                  #   (column(width = 6,
-                 #           dataTableOutput("datatable_df")
+                 #           dataTableOutput("fao_production_df")
                  #   )),
                  # ),
         ),
 
   ),
 )
+
 
 # Define server logic to display and download selected file ----
 server <- function(input, output, session) {
