@@ -230,8 +230,7 @@ ui <- fluidPage(
   # App title ----
   #titlePanel("Title of your project"),
   
-  navbarPage("🍉 🥝 U.S. Agricultural Exploration 🥕🌽",
-             theme = shinytheme("flatly"), 
+  navbarPage(theme = shinytheme("flatly"), 
              tags$head(tags$style(HTML('.navbar-static-top {background-color: #4caf50;}',
                                        '.navbar-default .navbar-nav>.active>a {background-color: #f99976;}',
                                        '.navbar-nav>.active>a:hover {background-color: #f99976;}',
@@ -243,7 +242,7 @@ ui <- fluidPage(
                                        '.navbar-default .btn-link:hover,.navbar-default .btn-link:focus {color: #fcc6b3}'
                                        
              ))),
-             tabPanel("Home", fluid = TRUE,
+             tabPanel("Home 🥕", fluid = TRUE,
                       align="left",
                       h2('Food For Thought'),
                       p("Since the first rooster's crow, food and its associated culinary traditions have played a significant role in the culture of 
